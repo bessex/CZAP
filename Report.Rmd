@@ -1,0 +1,35 @@
+---
+title: "Final Project..."
+author: "Ben Essex, Derek Che, & Chris Marston"
+date: 3/26/2022
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+#TODO (add outline comments)
+
+## Data Collection
+
+#TODO (add outline comments)
+
+## Methodology
+
+#TODO (add outline comments)
+
+## Analysis
+
+#TODO (add outline comments)
+
+## Limitations
+
+#TODO (add outline comments)
+
+## Conclusions
+
+#TODO (add outline comments)
+
