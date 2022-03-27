@@ -13,9 +13,62 @@ knitr::opts_chunk$set(echo = TRUE)
 
 #TODO (add outline comments)
 
+**PROPOSED QUESTIONS** #TODO (we might want to slim these down a bit)
+
+These are the two primary questions we originally set out to answer.
+
+- "Do Covid case rates affect Zoom lecture attendance?"
+- "Does weather predict Zoom lecture attendance?"
+
+These are the original questions we had proposed broken down into a more "testable" format as per Scott's instructions.
+
+- "Does weather predict Zoom lecture attendance?"
+    - "Does the temperature 2 hours before lecture affect Zoom lecture attendance?"
+    - "Does the temperature 1 hour before lecture affect Zoom lecture attendance?"
+    - "Does the temperature at the start of lecture affect Zoom lecture attendance?"
+    - "Does the type of weather (cloudy, sunny, etc.) affect Zoom lecture attendance?"
+- "Do University of Utah Covid case rates affect Zoom lecture attendance?"
+    - "Is Zoom lecture attendance affected by the total number of new Covid Cases at the University of Utah?"
+    - "Is Zoom lecture attendance affected by the 7-day average of new Covid case rates at the University of Utah?"
+- "Do Salt Lake County Covid case rates affect Zoom lecture attendance?"
+    - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
+    - "Is Zoom lecture attendance affected by the 7-day average case rate per 100,000 in SLC County?"
+    - "Is Zoom lecture attendance affected by the 7-day average positive test rate in SLC County?"
+
 ## Data Collection
 
 #TODO (add outline comments)
+
+Due to the breadth of scope of the two questions being answered in this study, data was gathered from a range of sources.
+
+**Salt Lake County Covid Data**
+
+- Data was gathered from the Utah Covid Dashboard (overview) website [here](https://coronavirus-dashboard.utah.gov/overview.html) 
+
+**University of Utah Covid Data**
+
+- Data was gathered from the University of Utah Covid information page.
+- Important Notes:
+    - The U stopped posting Covid data to their public site partway through the collection period.
+        - Currently attempting to get the data from them directly...
+
+**Weather Data**
+
+Weather data was pulled from:
+
+- DarkSky for first part of data collection period.
+- OpenWeather for last part of data collection period.
+- Important Notes:
+    - We switched data collection sources part way through the collection period.
+
+**Zoom Attendance Data (headcounts)**
+
+- Gathered directly by attending Zoom and recording attendee count by Zoom.
+    - Professor excluded from count.
+    - Excluded ourselves if we would have attended in person otherwise.
+    - TAs were left in the counts - too difficult to remove them accurately.
+    - Attendees counts were taken 10 min into the lecture, at the halfway point, and 10 min before the lecture ended.
+
 
 ## Methodology
 
