@@ -1,8 +1,15 @@
 ---
 title: "Final Project..."
 author: "Ben Essex, Derek Che, & Chris Marston"
-date: 3/26/2022
-output: html_document
+date: 04/02/2022
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: pygments
+    downcute_theme: "chaos"
 ---
 
 ```{r setup, include=FALSE}
@@ -75,6 +82,36 @@ Weather data was pulled from:
 #TODO (add outline comments)
 
 ## Analysis
+
+```{r}
+# import libraries
+# data <- read csvs
+
+# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+# |  Date |  T+10 | T+40 | T+70 | mean(...) | Temp T-2 | Temp T-1 | Temp T-0 | Weather | Class | UU New Cases | UU 7-Day Avg New Cases | SLCo Case Rate | SLCo 7-Day Avg Case Rate| SLCo 7-Day Avg Positive Test Rate | 
+# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+# regression analyses:
+#   - stimulus: nominal_weather, response: mean_attendance
+#     - logistic regression(?)
+#   - stimulus: temperature ->
+#     - linear regression
+#     - T-2 -> mean_attendance
+#     - T-1 -> mean_attendance
+#     - T-0 -> mean_attendance
+#   - stimulus: COVID... ->
+#     - linear regression
+#     - uu_new_cases -> mean_attendance
+#     - uu_new_cases_7day_avg -> mean_attendance
+#     - slco_case_rate -> mean_attendance
+#     - slco_case_rate_7day_avg -> mean_attendance
+#     - slco_pos_test_rate_7day_avg -> mean_attendance
+#   - more?
+
+# correlation coefficients
+#   - confidence interval
+#   - point estimate
+```
 
 #TODO (add outline comments)
 
