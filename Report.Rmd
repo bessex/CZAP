@@ -21,15 +21,22 @@ These are the two primary questions we originally set out to answer.
 
 These are the original questions we had proposed broken down into a more "testable" format as per Scott's instructions.
 
-- "Does weather predict Zoom lecture attendance?"
+- "Does weather predict Zoom lecture attendance?
     - "Does the temperature 2 hours before lecture affect Zoom lecture attendance?"
     - "Does the temperature 1 hour before lecture affect Zoom lecture attendance?"
     - "Does the temperature at the start of lecture affect Zoom lecture attendance?"
-    - "Does the type of weather (cloudy, sunny, etc.) affect Zoom lecture attendance?"
 - "Do Salt Lake County Covid case rates affect Zoom lecture attendance?"
     - "Is Zoom lecture attendance affected by the 7-day average case rate per 100,000 in SLC County?"
     - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
     - "Is Zoom lecture attendance affected by the 7-day average positive test rate in SLC County?"
+
+FOCUSED QUESTIONS LIST 
+
+- "Does the mean temperature before class starts affect Zoom attendence?" (use the mean temp from T+2, T+1, & T=0)
+- "Does the 7 day average case rate per 100k in Utah affect Zoom attendence?"
+- "Does the Salt Lake County percent positive test rate affect Zoom attendence?"
+
+
 
 ## Data Collection
 
