@@ -26,12 +26,9 @@ These are the original questions we had proposed broken down into a more "testab
     - "Does the temperature 1 hour before lecture affect Zoom lecture attendance?"
     - "Does the temperature at the start of lecture affect Zoom lecture attendance?"
     - "Does the type of weather (cloudy, sunny, etc.) affect Zoom lecture attendance?"
-- "Do University of Utah Covid case rates affect Zoom lecture attendance?"
-    - "Is Zoom lecture attendance affected by the total number of new Covid Cases at the University of Utah?"
-    - "Is Zoom lecture attendance affected by the 7-day average of new Covid case rates at the University of Utah?"
 - "Do Salt Lake County Covid case rates affect Zoom lecture attendance?"
-    - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
     - "Is Zoom lecture attendance affected by the 7-day average case rate per 100,000 in SLC County?"
+    - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
     - "Is Zoom lecture attendance affected by the 7-day average positive test rate in SLC County?"
 
 ## Data Collection
@@ -75,6 +72,8 @@ Weather data was pulled from:
 
 ## Analysis
 
+#TODO (add outline comments)
+
 ```{r}
 # import libraries
 # data <- read csvs
@@ -105,7 +104,45 @@ Weather data was pulled from:
 #   - point estimate
 ```
 
-#TODO (add outline comments)
+**TODO**
+
+- [ ] Need to figure out how many students are enrolled in each class
+    - We need to get the attendence _rate_, not raw attendence counts.
+    - Can get these from CIS on the course catalouge page for each class period.
+
+1. Decide on the data sets we want to use for covid cases
+2. Load data into R-table as per outline above (table headers)
+3. Clean data
+    - Attendence Data
+        - Calculate the average raw attendence count for each day recorded for each class
+        - Calculate attendence rate for each day recored for each class
+        - Calculate the average attendence rate for all classes recorded on each day
+        - (this gives us a single attendence value for each day to match with our single covid data point for each day)
+    - Pull data for desired date range (this sememster) from Covid data
+        - This should yield a single data point for each day automatically (per metric)
+4. Visualize data with...
+    - 7-day Average Case Counts (Utah State Daily Case Count & 7-Day Avg Case Count)
+5. Calcualte correlation coefficient point estimate
+6. Calculate correlation coefficient confidence interval
+
+
+```{r}
+# Utah State Daily Case Count & 7-Day Avg Case Count
+    # Does 7-Day avg affect Zoom attendence?
+    # Does Daily Case Count affect Zoom attendence?
+
+UT_SW_CaseCountAndSevenDayAvg = read.csv("Data/Utah State Daily Case Count & 7-Day Avg Case Count.csv")
+CS_4400_Attendence_Data = read.csv(("Data/CS4400 Attendence Data.csv"))
+
+
+
+UT_SW_CaseCountAndSevenDayAvg = UT_SW_CaseCountAndSevenDayAvg[]
+
+```
+
+
+
+
 
 ## Limitations
 
