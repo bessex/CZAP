@@ -2,14 +2,6 @@
 title: "Final Project..."
 author: "Ben Essex, Derek Che, & Chris Marston"
 date: 04/02/2022
-output:
-  rmdformats::downcute:
-    self_contained: true
-    thumbnails: true
-    lightbox: true
-    gallery: false
-    highlight: pygments
-    downcute_theme: "chaos"
 ---
 
 ```{r setup, include=FALSE}
