@@ -25,6 +25,9 @@ These are the original questions we had proposed broken down into a more "testab
     - "Does the temperature 2 hours before lecture affect Zoom lecture attendance?"
     - "Does the temperature 1 hour before lecture affect Zoom lecture attendance?"
     - "Does the temperature at the start of lecture affect Zoom lecture attendance?"
+- "Do University of Utah Covid case rates affect Zoom lecture attendance?"
+    - "Is Zoom lecture attendance affected by the total number of new Covid Cases at the University of Utah?"
+    - "Is Zoom lecture attendance affected by the 7-day average of new Covid case rates at the University of Utah?"
 - "Do Salt Lake County Covid case rates affect Zoom lecture attendance?"
     - "Is Zoom lecture attendance affected by the 7-day average case rate per 100,000 in SLC County?"
     - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
@@ -134,19 +137,40 @@ Weather data was pulled from:
 
 
 ```{r}
-# Utah State Daily Case Count & 7-Day Avg Case Count
-    # Does 7-Day avg affect Zoom attendence?
-    # Does Daily Case Count affect Zoom attendence?
+# READING IN DATA
 
-UT_SW_CaseCountAndSevenDayAvg = read.csv("Data/Utah State Daily Case Count & 7-Day Avg Case Count.csv")
-CS_4400_Attendence_Data = read.csv(("Data/CS4400 Attendence Data.csv"))
-
-
-
-UT_SW_CaseCountAndSevenDayAvg = UT_SW_CaseCountAndSevenDayAvg[]
+atd_and_weather_data = read.csv("data/3130 Final Project Data Sheet - Atd & Weather.csv")
+atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
 
 ```
 
+```{R}
+# GENERATING VISUALIZATIONS
+
+
+
+
+```
+
+```{R}
+# CALCULATING CORRELATION COEFFICIENTS (point estimates)
+
+# mean_daily_atd_rate --- mean_daily_temp
+
+mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                  atd_daily_temp_and_covid$mean_daily_temp)
+
+
+
+# mean_daily_atd_rate --- daily_confirmed_case_count
+
+# mean_daily_atd_rate --- confirmed_case_count_7d_avg
+
+# mean_daily_atd_rate --- positive_test_rate_7d_avg
+
+
+# CALCULATING CORRELATION COEFFICIENT CONFIDENCE INTERVALS
+```
 
 
 
