@@ -169,15 +169,15 @@ PooledStandardDeviation = function(n_1, n_2, x_1, x_2, s_1, s_2) {
 
 # Two variable CI = (x_1 - x_2) +/- t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
 
-CILower = function(pooled_sd, t_value, x_1, x_2, s_1, s_2) { # Entered t-value shoud be positive
+CILower = function(pooled_sd, z_score, x_1, x_2, n_1, n_2) { # Entered t-value shoud be positive
     return(
-        (x_1 - x_2) - t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
+        abs( (x_1 - x_2) ) - z_score * pooled_sd * sqrt( (1 / n_1) + (1 / n_2) )
     )
 }
 
-CIUpper = function(pooled_sd, t_value, x_1, x_2, s_1, s_2) { # Entered t-value shoud be positive
+CIUpper = function(pooled_sd, z_score, x_1, x_2, n_1, n_2) { # Entered t-value shoud be positive
     return(
-        (x_1 - x_2) + t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
+        abs( (x_1 - x_2) ) + z_score * pooled_sd * sqrt( (1 / n_1) + (1 / n_2) )
     )
 }
 
@@ -198,7 +198,10 @@ TwoTailedTTest = function(confidence_level, degrees_freedom){
 ```{r}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
 
-#Correlation coefficent
+# Correlation coefficent ALT
+cor.test() # TODO: figure out how to use this...
+
+# Correlation coefficent
 mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$mean_daily_temp)
 
@@ -224,22 +227,23 @@ atd_rate_vs_temp_pooled_sd = PooledStandardDeviation(mean_daily_atd_rate_sample_
 
 # Confidence Interval
 
-# t-value
+# t-value - TODO: I don't think we need the t-value after all
 atd_rate_vs_temp_t_value = TwoTailedTTest(0.95, atd_rate_vs_temp_pooled_dof)
 
 # Might be able to use fisher.test here instead, but not sure how to do it...
-CI_upper = CIUpper(atd_rate_vs_temp_pooled_sd,
-                   atd_rate_vs_temp_t_value,
+atd_rate_vs_temp_CI_upper = CIUpper(atd_rate_vs_temp_pooled_sd,
+                   1.96,
                    mean_daily_atd_rate_mean,
                    mean_daily_temp_mean,
-                   mean_daily_atd_rate_sd,
-                   mean_daily_temp_sd)
-CI_lower = CILower(atd_rate_vs_temp_pooled_sd,
-                   atd_rate_vs_temp_t_value,
+                   mean_daily_atd_rate_sample_size,
+                   mean_daily_temp_sample_size)
+
+atd_rate_vs_temp_CI_lower = CILower(atd_rate_vs_temp_pooled_sd,
+                   1.96,
                    mean_daily_atd_rate_mean,
                    mean_daily_temp_mean,
-                   mean_daily_atd_rate_sd,
-                   mean_daily_temp_sd)
+                   mean_daily_atd_rate_sample_size,
+                   mean_daily_temp_sample_size)
 
 ```
 
