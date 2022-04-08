@@ -155,95 +155,70 @@ atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean A
 ```{R}
 # FUNCTIONS
 
-# s_1, s_2: sample standard deviations
-# x_1, x_2: sample means
-# n_1, n_2: sample sizes
-
-# pooled_sd = sqrt( ( (n_1 - 1) * (s_1)^2 + (n_2 - 1) * (s_2)^2 ) / ( n_1 + n_2 - 2 ) )
-
-PooledStandardDeviation = function(n_1, n_2, x_1, x_2, s_1, s_2) {
+Fisher_Transformation = function(correlation_coefficent) {
     return(
-        sqrt( ( (n_1 - 1) * (s_1)^2 + (n_2 - 1) * (s_2)^2 ) / ( n_1 + n_2 - 2 ) )
+        log( ( (1 + correlation_coefficent) / (1 - correlation_coefficent) ) ) / 2
     )
 }
 
-# Two variable CI = (x_1 - x_2) +/- t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
-
-CILower = function(pooled_sd, z_score, x_1, x_2, n_1, n_2) { # Entered t-value shoud be positive
+# Use our corellation coefficent for the data_value here
+Z_Score = function(data_value, sample_mean, sample_sd) {
     return(
-        abs( (x_1 - x_2) ) - z_score * pooled_sd * sqrt( (1 / n_1) + (1 / n_2) )
+        ( date_value - sample_mean ) / sample_sd
     )
 }
 
-CIUpper = function(pooled_sd, z_score, x_1, x_2, n_1, n_2) { # Entered t-value shoud be positive
+Log_Bounds = function(upper, fisher_transformed, z_score, sample_size) {
+    if (upper == TRUE) # Calculate the upper bound
+    {
+        return(
+            fisher_transformed + ( z_score / sqrt( sample_size - 3) )
+        )
+    }
+    else # If upper is false, default to calculating the lower bound
+    {
+        return(
+            fisher_transformed - ( z_score / sqrt( sample_size - 3) )
+        )
+    }
+}
+
+CI_Upper = function(log_upper_bound) {
     return(
-        abs( (x_1 - x_2) ) + z_score * pooled_sd * sqrt( (1 / n_1) + (1 / n_2) )
+        (exp(2 * log_upper_bound) - 1) / (exp(2 * log_upper_bound) + 1 )
     )
 }
 
-OneTailedTTest = function(confidence_level, degrees_freedom){
+CI_Lower = function(log_lower_bound) {
     return(
-        abs( qt(1 - confidence_level, degrees_freedom) )
+        (exp(2 * log_lower_bound) - 1) / (exp(2 * log_lower_bound) + 1 )
     )
 }
 
-TwoTailedTTest = function(confidence_level, degrees_freedom){
-    return(
-        abs( qt( (1 - confidence_level) / 2, degrees_freedom) )
-    )
-}
 
 ```
 
 ```{r}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
 
-# Correlation coefficent ALT
-cor.test() # TODO: figure out how to use this...(see here: https://bookdown.org/ndphillips/YaRrr/correlation-cor-test.html)
-
-# Correlation coefficent
+# Find the Correlation Coefficent
 mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$mean_daily_temp)
 
-mean_daily_atd_rate_mean = mean(atd_daily_temp_and_covid$mean_daily_atd_rate)
-mean_daily_atd_rate_sd = sd(atd_daily_temp_and_covid$mean_daily_atd_rate)
-mean_daily_atd_rate_sample_size = length(atd_daily_temp_and_covid$mean_daily_atd_rate)
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation(0.56)
 
-mean_daily_temp_mean = mean(atd_daily_temp_and_covid$mean_daily_temp)
-mean_daily_temp_sd = sd(atd_daily_temp_and_covid$mean_daily_temp)
-mean_daily_temp_sample_size = length(atd_daily_temp_and_covid$mean_daily_temp)
+# Find upper and lower bounds
+z_value = 1.96
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_value, 30)
 
-# Degrees of Freedom = n_1 + n_2 - 2
-atd_rate_vs_temp_pooled_dof = mean_daily_atd_rate_sample_size + mean_daily_temp_sample_size - 2
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_value, 30)
 
-# Pooled Standard Deviation
-atd_rate_vs_temp_pooled_sd = PooledStandardDeviation(mean_daily_atd_rate_sample_size,
-                                      mean_daily_temp_sample_size,
-                                      mean_daily_atd_rate_mean,
-                                      mean_daily_temp_mean,
-                                      mean_daily_atd_rate_sd,
-                                      mean_daily_temp_sd
-                                     )
+# Find the confidence interval
 
-# Confidence Interval
+CI_upper_val = CI_Upper(log_upper_bound)
 
-# t-value - TODO: I don't think we need the t-value after all
-atd_rate_vs_temp_t_value = TwoTailedTTest(0.95, atd_rate_vs_temp_pooled_dof)
-
-# Might be able to use fisher.test here instead, but not sure how to do it...
-atd_rate_vs_temp_CI_upper = CIUpper(atd_rate_vs_temp_pooled_sd,
-                   1.96,
-                   mean_daily_atd_rate_mean,
-                   mean_daily_temp_mean,
-                   mean_daily_atd_rate_sample_size,
-                   mean_daily_temp_sample_size)
-
-atd_rate_vs_temp_CI_lower = CILower(atd_rate_vs_temp_pooled_sd,
-                   1.96,
-                   mean_daily_atd_rate_mean,
-                   mean_daily_temp_mean,
-                   mean_daily_atd_rate_sample_size,
-                   mean_daily_temp_sample_size)
+CI_lower_val = CI_Lower(log_lower_bound)
 
 ```
 
