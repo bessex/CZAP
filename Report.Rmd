@@ -153,23 +153,29 @@ atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean A
 ```
 
 ```{R}
-# CALCULATING CORRELATION COEFFICIENTS (point estimates)
+# FUNCTIONS
+
+# s_1, s_2: sample standard deviations
+# x_1, x_2: sample means
+# n_1, n_2: sample sizes
 
 # pooled_sd = sqrt( ( (n_1 - 1) * (s_1)^2 + (n_2 - 1) * (s_2)^2 ) / ( n_1 + n_2 - 2 ) )
-PooledSD = function(n_1, n_2, x_1, x_2, s_1, s_2) {
+
+PooledStandardDeviation = function(n_1, n_2, x_1, x_2, s_1, s_2) {
     return(
         sqrt( ( (n_1 - 1) * (s_1)^2 + (n_2 - 1) * (s_2)^2 ) / ( n_1 + n_2 - 2 ) )
     )
 }
 
 # Two variable CI = (x_1 - x_2) +/- t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
+
 CILower = function(pooled_sd, t_value, x_1, x_2, s_1, s_2) { # Entered t-value shoud be positive
     return(
         (x_1 - x_2) - t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
     )
 }
 
-CILower = function(pooled_sd, t_value, x_1, x_2, s_1, s_2) { # Entered t-value shoud be positive
+CIUpper = function(pooled_sd, t_value, x_1, x_2, s_1, s_2) { # Entered t-value shoud be positive
     return(
         (x_1 - x_2) + t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
     )
@@ -187,13 +193,14 @@ TwoTailedTTest = function(confidence_level, degrees_freedom){
     )
 }
 
-# mean_daily_atd_rate --- mean_daily_temp
+```
+
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
 
 #Correlation coefficent
 mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$mean_daily_temp)
-
-z_value = 1.96
 
 mean_daily_atd_rate_mean = mean(atd_daily_temp_and_covid$mean_daily_atd_rate)
 mean_daily_atd_rate_sd = sd(atd_daily_temp_and_covid$mean_daily_atd_rate)
@@ -206,11 +213,8 @@ mean_daily_temp_sample_size = length(atd_daily_temp_and_covid$mean_daily_temp)
 # Degrees of Freedom = n_1 + n_2 - 2
 atd_rate_vs_temp_pooled_dof = mean_daily_atd_rate_sample_size + mean_daily_temp_sample_size - 2
 
-# t-value (we want 2.00, per the table)
-test_t_value = qt(1-.05/2, atd_rate_vs_temp_pooled_dof)
-
 # Pooled Standard Deviation
-atd_rate_vs_temp_pooled_sd = PooledSD(mean_daily_atd_rate_sample_size,
+atd_rate_vs_temp_pooled_sd = PooledStandardDeviation(mean_daily_atd_rate_sample_size,
                                       mean_daily_temp_sample_size,
                                       mean_daily_atd_rate_mean,
                                       mean_daily_temp_mean,
@@ -220,22 +224,38 @@ atd_rate_vs_temp_pooled_sd = PooledSD(mean_daily_atd_rate_sample_size,
 
 # Confidence Interval
 
-
-# TODO NEXT: CILower function and CIUpper function - make sure that they process the sign of the t-value that is  inputted
+# t-value
+atd_rate_vs_temp_t_value = TwoTailedTTest(0.95, atd_rate_vs_temp_pooled_dof)
 
 # Might be able to use fisher.test here instead, but not sure how to do it...
-# CI = (x_1 - x_2) +/- t_value * pooled_sd * sqrt( (1 / s_1) + (1 / s_2) )
-CI_lower = 
-CI_upper = 
+CI_upper = CIUpper(atd_rate_vs_temp_pooled_sd,
+                   atd_rate_vs_temp_t_value,
+                   mean_daily_atd_rate_mean,
+                   mean_daily_temp_mean,
+                   mean_daily_atd_rate_sd,
+                   mean_daily_temp_sd)
+CI_lower = CILower(atd_rate_vs_temp_pooled_sd,
+                   atd_rate_vs_temp_t_value,
+                   mean_daily_atd_rate_mean,
+                   mean_daily_temp_mean,
+                   mean_daily_atd_rate_sd,
+                   mean_daily_temp_sd)
 
-# mean_daily_atd_rate --- daily_confirmed_case_count
+```
 
-# mean_daily_atd_rate --- confirmed_case_count_7d_avg
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INFERVALS FOR mean_daily_atd_rate --- daily_confirmed_case_count
 
-# mean_daily_atd_rate --- positive_test_rate_7d_avg
+```
 
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- confirmed_case_count_7d_avg
 
-# CALCULATING CORRELATION COEFFICIENT CONFIDENCE INTERVALS
+```
+
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- positive_test_rate_7d_avg
+
 ```
 
 
