@@ -177,6 +177,7 @@ CILower = function(pooled_sd, t_value, x_1, x_2, s_1, s_2) { # Entered t-value s
 
 # mean_daily_atd_rate --- mean_daily_temp
 
+#Correlation coefficent
 mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$mean_daily_temp)
 
@@ -190,6 +191,13 @@ mean_daily_temp_mean = mean(atd_daily_temp_and_covid$mean_daily_temp)
 mean_daily_temp_sd = sd(atd_daily_temp_and_covid$mean_daily_temp)
 mean_daily_temp_sample_size = length(atd_daily_temp_and_covid$mean_daily_temp)
 
+# Degrees of Freedom = n_1 + n_2 - 2
+atd_rate_vs_temp_pooled_dof = mean_daily_atd_rate_sample_size + mean_daily_temp_sample_size - 2
+
+# t-value (we want 2.00, per the table)
+test_t_value = qt(1-.05/2, atd_rate_vs_temp_pooled_dof)
+
+# Pooled Standard Deviation
 atd_rate_vs_temp_pooled_sd = PooledSD(mean_daily_atd_rate_sample_size,
                                       mean_daily_temp_sample_size,
                                       mean_daily_atd_rate_mean,
@@ -198,6 +206,7 @@ atd_rate_vs_temp_pooled_sd = PooledSD(mean_daily_atd_rate_sample_size,
                                       mean_daily_temp_sd
                                      )
 
+# Confidence Interval
 
 
 # TODO NEXT: CILower function and CIUpper function - make sure that they process the sign of the t-value that is  inputted
