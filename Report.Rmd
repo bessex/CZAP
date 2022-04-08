@@ -199,7 +199,7 @@ TwoTailedTTest = function(confidence_level, degrees_freedom){
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
 
 # Correlation coefficent ALT
-cor.test() # TODO: figure out how to use this...
+cor.test() # TODO: figure out how to use this...(see here: https://bookdown.org/ndphillips/YaRrr/correlation-cor-test.html)
 
 # Correlation coefficent
 mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
