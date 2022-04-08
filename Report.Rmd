@@ -175,6 +175,18 @@ CILower = function(pooled_sd, t_value, x_1, x_2, s_1, s_2) { # Entered t-value s
     )
 }
 
+OneTailedTTest = function(confidence_level, degrees_freedom){
+    return(
+        abs( qt(1 - confidence_level, degrees_freedom) )
+    )
+}
+
+TwoTailedTTest = function(confidence_level, degrees_freedom){
+    return(
+        abs( qt( (1 - confidence_level) / 2, degrees_freedom) )
+    )
+}
+
 # mean_daily_atd_rate --- mean_daily_temp
 
 #Correlation coefficent
