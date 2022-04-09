@@ -155,6 +155,9 @@ atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean A
 ```{R}
 # FUNCTIONS
 
+# Confidence Interval Calculation: https://www.statology.org/confidence-interval-correlation-coefficient/
+# z-score Calculation: https://www.statology.org/z-score-r/
+
 Fisher_Transformation = function(correlation_coefficent) {
     return(
         log( ( (1 + correlation_coefficent) / (1 - correlation_coefficent) ) ) / 2
