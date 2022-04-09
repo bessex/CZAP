@@ -8,6 +8,10 @@ date: 04/02/2022
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+*******************************
+**HARD DEADLINE: Wed 20 @ 6PM**
+*******************************
+
 ## Introduction
 
 #TODO (add outline comments)
@@ -189,7 +193,7 @@ mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
 fisher_transformed = Fisher_Transformation( mean_daily_temp_correlation )
 
 # Calculate z-score
-z_score = 1.96 # 95% confidence
+z_score = 1.96 # 95% confidence - assumes normally distributed data
 
 # Find upper and lower bounds
 log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
