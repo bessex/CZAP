@@ -212,7 +212,7 @@ mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
 fisher_transformed = Fisher_Transformation( mean_daily_temp_correlation )
 
 # Calculate z-score
-z_score = 1.96
+z_score = 1.96 # 95% confidence
 
 # Find upper and lower bounds
 log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
@@ -229,15 +229,75 @@ CI_lower_atd_vs_temp = CI_Lower(log_lower_bound)
 ```{r}
 # CORRELATION COEFFICIENT & CONFIDENCE INFERVALS FOR mean_daily_atd_rate --- daily_confirmed_case_count
 
+# Find the Correlation Coefficent
+mean_daily_case_count_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                        atd_daily_temp_and_covid$daily_confirmed_case_count)
+
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation( mean_daily_case_count_correlation )
+
+# Calculate z-score
+z_score = 1.96 # 95% confidence
+
+# Find upper and lower bounds
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+# Find the confidence interval
+CI_upper_atd_vs_case_count = CI_Upper(log_upper_bound)
+
+CI_lower_atd_vs_case_count = CI_Lower(log_lower_bound)
+
 ```
 
 ```{r}
-# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- confirmed_case_count_7d_avg
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- confirmed_case_count_7d_avg (confirmed_7dcc)
+
+# Find the Correlation Coefficent
+mean_daily_confirmed_7dcc_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                  atd_daily_temp_and_covid$confirmed_case_count_7d_avg)
+
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation( mean_daily_confirmed_7dcc_correlation )
+
+# Calculate z-score
+z_score = 1.96 # 95% confidence
+
+# Find upper and lower bounds
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+# Find the confidence interval
+CI_upper_atd_vs_confirmed_7dcc = CI_Upper(log_upper_bound)
+
+CI_lower_atd_vs_confirmed_7dcc = CI_Lower(log_lower_bound)
 
 ```
 
 ```{r}
-# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- positive_test_rate_7d_avg
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- positive_test_rate_7d_avg (positive_7dtr)
+
+# Find the Correlation Coefficent
+mean_daily_positive_7dtr_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                  atd_daily_temp_and_covid$positive_test_rate_7d_avg)
+
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation( mean_daily_positive_7dtr_correlation )
+
+# Calculate z-score
+z_score = 1.96 # 95% confidence
+
+# Find upper and lower bounds
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+# Find the confidence interval
+CI_upper_atd_vs_positive_7dtr = CI_Upper(log_upper_bound)
+
+CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
 
 ```
 
