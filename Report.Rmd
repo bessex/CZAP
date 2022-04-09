@@ -164,7 +164,7 @@ Fisher_Transformation = function(correlation_coefficent) {
 # Use our corellation coefficent for the data_value here
 Z_Score = function(data_value, sample_mean, sample_sd) {
     return(
-        ( date_value - sample_mean ) / sample_sd
+        ( data_value - sample_mean ) / sample_sd
     )
 }
 
@@ -206,19 +206,20 @@ mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$mean_daily_temp)
 
 # Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
-fisher_transformed = Fisher_Transformation(0.56)
+fisher_transformed = Fisher_Transformation( mean_daily_temp_correlation )
+
+# Calculate z-score
+z_score = 1.96
 
 # Find upper and lower bounds
-z_value = 1.96
-log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_value, 30)
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
 
-log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_value, 30)
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
 
 # Find the confidence interval
+CI_upper_atd_vs_temp = CI_Upper(log_upper_bound)
 
-CI_upper_val = CI_Upper(log_upper_bound)
-
-CI_lower_val = CI_Lower(log_lower_bound)
+CI_lower_atd_vs_temp = CI_Lower(log_lower_bound)
 
 ```
 
