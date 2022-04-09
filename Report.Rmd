@@ -2,19 +2,15 @@
 title: "Final Project..."
 author: "Ben Essex, Derek Che, & Chris Marston"
 date: 04/02/2022
-output:
-  rmdformats::downcute:
-    self_contained: true
-    thumbnails: true
-    lightbox: true
-    gallery: false
-    highlight: pygments
-    downcute_theme: "chaos"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+*******************************
+**HARD DEADLINE: Wed 20 @ 6PM**
+*******************************
 
 ## Introduction
 
@@ -29,18 +25,24 @@ These are the two primary questions we originally set out to answer.
 
 These are the original questions we had proposed broken down into a more "testable" format as per Scott's instructions.
 
-- "Does weather predict Zoom lecture attendance?"
+- "Does weather predict Zoom lecture attendance?
     - "Does the temperature 2 hours before lecture affect Zoom lecture attendance?"
     - "Does the temperature 1 hour before lecture affect Zoom lecture attendance?"
     - "Does the temperature at the start of lecture affect Zoom lecture attendance?"
-    - "Does the type of weather (cloudy, sunny, etc.) affect Zoom lecture attendance?"
 - "Do University of Utah Covid case rates affect Zoom lecture attendance?"
     - "Is Zoom lecture attendance affected by the total number of new Covid Cases at the University of Utah?"
     - "Is Zoom lecture attendance affected by the 7-day average of new Covid case rates at the University of Utah?"
 - "Do Salt Lake County Covid case rates affect Zoom lecture attendance?"
-    - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
     - "Is Zoom lecture attendance affected by the 7-day average case rate per 100,000 in SLC County?"
+    - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
     - "Is Zoom lecture attendance affected by the 7-day average positive test rate in SLC County?"
+
+FOCUSED QUESTIONS LIST 
+
+- "Does the mean temperature before class starts affect Zoom attendence?" (use the mean temp from T+2, T+1, & T=0)
+- "Does the 7 day average case rate per 100k in Utah affect Zoom attendence?"
+- "Does the Salt Lake County percent positive test rate affect Zoom attendence?"
+
 
 ## Data Collection
 
@@ -83,6 +85,8 @@ Weather data was pulled from:
 
 ## Analysis
 
+#TODO (add outline comments)
+
 ```{r}
 # import libraries
 # data <- read csvs
@@ -113,7 +117,173 @@ Weather data was pulled from:
 #   - point estimate
 ```
 
-#TODO (add outline comments)
+```{r}
+# READING IN DATA
+
+atd_and_weather_data = read.csv("data/3130 Final Project Data Sheet - Atd & Weather.csv")
+atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
+
+```
+
+```{R}
+# GENERATING VISUALIZATIONS
+
+
+
+
+```
+
+```{R}
+# FUNCTIONS
+
+# Confidence Interval Calculation: https://www.statology.org/confidence-interval-correlation-coefficient/
+# z-score Calculation: https://www.statology.org/z-score-r/
+
+Fisher_Transformation = function(correlation_coefficent) {
+    return(
+        log( ( (1 + correlation_coefficent) / (1 - correlation_coefficent) ) ) / 2
+    )
+}
+
+# Use our corellation coefficent for the data_value here
+Z_Score = function(data_value, sample_mean, sample_sd) {
+    return(
+        ( data_value - sample_mean ) / sample_sd
+    )
+}
+
+Log_Bounds = function(upper, fisher_transformed, z_score, sample_size) {
+    if (upper == TRUE) # Calculate the upper bound
+    {
+        return(
+            fisher_transformed + ( z_score / sqrt( sample_size - 3) )
+        )
+    }
+    else # If upper is false, default to calculating the lower bound
+    {
+        return(
+            fisher_transformed - ( z_score / sqrt( sample_size - 3) )
+        )
+    }
+}
+
+CI_Upper = function(log_upper_bound) {
+    return(
+        (exp(2 * log_upper_bound) - 1) / (exp(2 * log_upper_bound) + 1 )
+    )
+}
+
+CI_Lower = function(log_lower_bound) {
+    return(
+        (exp(2 * log_lower_bound) - 1) / (exp(2 * log_lower_bound) + 1 )
+    )
+}
+
+
+```
+
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
+
+# Find the Correlation Coefficent
+mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                  atd_daily_temp_and_covid$mean_daily_temp)
+
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation( mean_daily_temp_correlation )
+
+# Calculate z-score
+z_score = 1.96 # 95% confidence - assumes normally distributed data
+
+# Find upper and lower bounds
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+# Find the confidence interval
+CI_upper_atd_vs_temp = CI_Upper(log_upper_bound)
+
+CI_lower_atd_vs_temp = CI_Lower(log_lower_bound)
+
+```
+
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INFERVALS FOR mean_daily_atd_rate --- daily_confirmed_case_count
+
+# Find the Correlation Coefficent
+mean_daily_case_count_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                        atd_daily_temp_and_covid$daily_confirmed_case_count)
+
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation( mean_daily_case_count_correlation )
+
+# Calculate z-score
+z_score = 1.96 # 95% confidence
+
+# Find upper and lower bounds
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+# Find the confidence interval
+CI_upper_atd_vs_case_count = CI_Upper(log_upper_bound)
+
+CI_lower_atd_vs_case_count = CI_Lower(log_lower_bound)
+
+```
+
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- confirmed_case_count_7d_avg (confirmed_7dcc)
+
+# Find the Correlation Coefficent
+mean_daily_confirmed_7dcc_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                  atd_daily_temp_and_covid$confirmed_case_count_7d_avg)
+
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation( mean_daily_confirmed_7dcc_correlation )
+
+# Calculate z-score
+z_score = 1.96 # 95% confidence
+
+# Find upper and lower bounds
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+# Find the confidence interval
+CI_upper_atd_vs_confirmed_7dcc = CI_Upper(log_upper_bound)
+
+CI_lower_atd_vs_confirmed_7dcc = CI_Lower(log_lower_bound)
+
+```
+
+```{r}
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- positive_test_rate_7d_avg (positive_7dtr)
+
+# Find the Correlation Coefficent
+mean_daily_positive_7dtr_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
+                                  atd_daily_temp_and_covid$positive_test_rate_7d_avg)
+
+# Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
+fisher_transformed = Fisher_Transformation( mean_daily_positive_7dtr_correlation )
+
+# Calculate z-score
+z_score = 1.96 # 95% confidence
+
+# Find upper and lower bounds
+log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
+
+# Find the confidence interval
+CI_upper_atd_vs_positive_7dtr = CI_Upper(log_upper_bound)
+
+CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
+
+```
+
+
+
 
 ## Limitations
 
@@ -122,4 +292,3 @@ Weather data was pulled from:
 ## Conclusions
 
 #TODO (add outline comments)
-
