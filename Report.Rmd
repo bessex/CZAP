@@ -40,7 +40,6 @@ FOCUSED QUESTIONS LIST
 - "Does the Salt Lake County percent positive test rate affect Zoom attendence?"
 
 
-
 ## Data Collection
 
 #TODO (add outline comments)
@@ -113,28 +112,6 @@ Weather data was pulled from:
 #   - confidence interval
 #   - point estimate
 ```
-
-**TODO**
-
-- [ ] Need to figure out how many students are enrolled in each class
-    - We need to get the attendence _rate_, not raw attendence counts.
-    - Can get these from CIS on the course catalouge page for each class period.
-
-1. Decide on the data sets we want to use for covid cases
-2. Load data into R-table as per outline above (table headers)
-3. Clean data
-    - Attendence Data
-        - Calculate the average raw attendence count for each day recorded for each class
-        - Calculate attendence rate for each day recored for each class
-        - Calculate the average attendence rate for all classes recorded on each day
-        - (this gives us a single attendence value for each day to match with our single covid data point for each day)
-    - Pull data for desired date range (this sememster) from Covid data
-        - This should yield a single data point for each day automatically (per metric)
-4. Visualize data with...
-    - 7-day Average Case Counts (Utah State Daily Case Count & 7-Day Avg Case Count)
-5. Calcualte correlation coefficient point estimate
-6. Calculate correlation coefficient confidence interval
-
 
 ```{r}
 # READING IN DATA
@@ -311,4 +288,3 @@ CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
 ## Conclusions
 
 #TODO (add outline comments)
-
