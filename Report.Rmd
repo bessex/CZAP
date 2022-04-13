@@ -14,14 +14,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Introduction
 
-#TODO (add outline comments)
+The COVID-19 pandemic has redefined many aspects of our lives especially how we interact with others. One such example is the advent of online learning at all levels of education to reduce contact between students and thereby avoid disease transmission. Students today enjoy the ability to tune into lectures remotely from anywhere with internet, as opposed to sitting in school, redefining the classroom setting. This was the status quo for a year while COVID remained rampant, but through the gradual vaccination status of the population and decreasing COVID cases, many schools have returned to a hybrid model: offering classes in-person that are broadcasted online. This is observable in our lives as many of the Computer Science courses at the University of Utah teach in classrooms, but also stream lectures through the video conferencing app Zoom. Given that COVID is less of a concern now and that people attend these Zoom lectures, we wanted to investigate potential variables that predict attendance. This led to the questions:
 
-**PROPOSED QUESTIONS** #TODO (we might want to slim these down a bit)
+1.    Do COVID case rates affect Zoom lecture attendance?
 
-These are the two primary questions we originally set out to answer.
+2.    Does weather predict Zoom lecture attendance?
 
-- "Do Covid case rates affect Zoom lecture attendance?"
-- "Does weather predict Zoom lecture attendance?"
+### Questions
+
+**"Do COVID case rates affect Zoom lecture attendance?"**
+
+LIST SPECIFIC QUESTIONS WE WILL ANSWER HERE
+
+**"Does weather predict Zoom lecture attendance?"**
+
+LIST SPECIFIC QUESTIONS WE WILL ANSWER HERE
+
 
 These are the original questions we had proposed broken down into a more "testable" format as per Scott's instructions.
 
@@ -44,7 +52,9 @@ FOCUSED QUESTIONS LIST
 - "Does the Salt Lake County percent positive test rate affect Zoom attendence?"
 
 
-## Data Collection
+## Planning: Data Collection
+
+To answer the previously posed questions, we decided to collect attendance data from Zoom for hybrid Computer Science courses at the University of Utah as well as local weather and COVID case number data. The courses sampled from were CS 3500, CS 4400, CS 3200, CS 5140, and CS 3130 where data would be collected every lecture spanning ~10 weeks. Zoom attendance data would be collected three times per lecture: 10 minutes after class started, halfway through class, and 10 minutes before the end of class. Attendance then would be calculated by taking the total number of participants in the Zoom lecture and subtracting one for the teacher. Temperature data for the day of each lecture would be obtained from OpenWeatherMap <https://openweathermap.org/city/5780993>, where the temperature was recorded two hours before the class, one hour before the class, and when class started. Moreover, we will record the weather condition when class starts from the same source. For COVID cases, we decided to look at data near the University of Utah: specifically data from the university itself  <https://coronavirus.utah.edu> and from Salt Lake County <https://coronavirus.utah.gov/case-counts>. From the University data, we will look at the total new cases in a day and the 7-day average of new cases. 
 
 #TODO (add outline comments)
 
@@ -286,6 +296,16 @@ CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
 
 
 ## Limitations
+
+One big limitation of the study was the fact that the courses chosen to study were a convenience sample. These were the classes that we were in and thus were easily accessible to collect data from. The implications of this are that our sample probably does a poor job
+
+Zoom attendance could contain TAs.
+
+Data is non continuous (holes for dates of labs and midterms)
+
+Not representative of the University population.
+
+COVID cases today may not impact attendance of the same day.
 
 #TODO (add outline comments)
 
