@@ -95,6 +95,39 @@ Weather data was pulled from:
 
 ## Analysis
 
+Let us examine what the data looks like.
+
+```{r}
+data = read.csv("./Data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
+boxplot(data$mean_daily_atd_rate)
+title(main = "Mean Daily Attendance Rate")
+boxplot(data$temp_6am)
+title(main = "Temperature 6am")
+boxplot(data$temp_6pm)
+title(main = "Temperature 6pm")
+boxplot(data$mean_daily_temp)
+title(main = "Mean Daily Temp")
+```
+
+```{r}
+library(ggplot2)
+data$date_2 = as.Date(data$date_2, format = "%m/%d/%Y")
+ggplot(data, aes(x=date_2)) +
+geom_line(aes(y=mean_daily_atd_rate)) + labs(title = "Mean Daily Attendance Rate Over Time", subtitle = "Jan 18, 2022 to Mar 24, 2022", y = "Attendance Count", x = "Date")
+
+ggplot(data, aes(x=date_2)) +
+geom_line(aes(y=mean_daily_temp)) + labs(title = "Mean Daily Temperature Rate Over Time", subtitle = "Jan 18, 2022 to Mar 24, 2022", y = "Temperature", x = "Date")
+
+ggplot(data, aes(x=date_2)) +
+geom_line(aes(y=daily_confirmed_case_count)) + labs(title = "UofU Daily Confirmed Case Count Rate Over Time", subtitle = "Jan 18, 2022 to Mar 24, 2022", y = "Temperature", x = "Date")
+
+ggplot(data, aes(x=date_2)) +
+geom_line(aes(y=confirmed_case_count_7d_avg)) + labs(title = "UofU Confirmed Case Count 7 Day Average Over Time", subtitle = "Jan 18, 2022 to Mar 24, 2022", y = "Confirmed Case Count", x = "Date")
+
+ggplot(data, aes(x=date_2)) +
+geom_line(aes(y=positive_test_rate_7d_avg)) + labs(title = "UofU Positive Test Rate 7 Day Average Over Time", subtitle = "Jan 18, 2022 to Mar 24, 2022", y = "Positive Test Rate", x = "Date")
+```
+
 #TODO (add outline comments)
 
 ```{r}
@@ -297,15 +330,19 @@ CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
 
 ## Limitations
 
-One big limitation of the study was the fact that the courses chosen to study were a convenience sample. These were the classes that we were in and thus were easily accessible to collect data from. The implications of this are that our sample probably does a poor job
+One big limitation of the study was the fact that the courses chosen to study were a convenience sample. These were the classes that we were in and thus were easily accessible to collect data from. The implications of this are that our sample probably does a poor job of representing the population of CS courses at the University of Utah. A better approach would have been to randomly choose classes from all the available CS hybrid courses offered at the University. Moreover, we could have increased our sample size to get data more representative of the population as a whole.
 
 Zoom attendance could contain TAs.
 
 Data is non continuous (holes for dates of labs and midterms)
 
-Not representative of the University population.
-
 COVID cases today may not impact attendance of the same day.
+
+## Course Specific Limitations
+
+### CS 3200
+
+For CS 3200, the teacher actively 
 
 #TODO (add outline comments)
 
