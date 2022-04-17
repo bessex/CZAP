@@ -8,116 +8,28 @@ date: 04/02/2022
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-*******************************
-**HARD DEADLINE: Wed 20 @ 6PM**
-*******************************
-
-## Introduction
-
-#TODO (add outline comments)
-
-**PROPOSED QUESTIONS** #TODO (we might want to slim these down a bit)
-
-These are the two primary questions we originally set out to answer.
-
-- "Do Covid case rates affect Zoom lecture attendance?"
-- "Does weather predict Zoom lecture attendance?"
-
-These are the original questions we had proposed broken down into a more "testable" format as per Scott's instructions.
-
-- "Does weather predict Zoom lecture attendance?
-    - "Does the temperature 2 hours before lecture affect Zoom lecture attendance?"
-    - "Does the temperature 1 hour before lecture affect Zoom lecture attendance?"
-    - "Does the temperature at the start of lecture affect Zoom lecture attendance?"
-- "Do University of Utah Covid case rates affect Zoom lecture attendance?"
-    - "Is Zoom lecture attendance affected by the total number of new Covid Cases at the University of Utah?"
-    - "Is Zoom lecture attendance affected by the 7-day average of new Covid case rates at the University of Utah?"
-- "Do Salt Lake County Covid case rates affect Zoom lecture attendance?"
-    - "Is Zoom lecture attendance affected by the 7-day average case rate per 100,000 in SLC County?"
-    - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
-    - "Is Zoom lecture attendance affected by the 7-day average positive test rate in SLC County?"
-
-FOCUSED QUESTIONS LIST 
-
-- "Does the mean temperature before class starts affect Zoom attendence?" (use the mean temp from T+2, T+1, & T=0)
-- "Does the 7 day average case rate per 100k in Utah affect Zoom attendence?"
-- "Does the Salt Lake County percent positive test rate affect Zoom attendence?"
-
-
-## Data Collection
-
-#TODO (add outline comments)
-
-Due to the breadth of scope of the two questions being answered in this study, data was gathered from a range of sources.
-
-**Salt Lake County Covid Data**
-
-- Data was gathered from the Utah Covid Dashboard (overview) website [here](https://coronavirus-dashboard.utah.gov/overview.html) 
-
-**University of Utah Covid Data**
-
-- Data was gathered from the University of Utah Covid information page.
-- Important Notes:
-    - The U stopped posting Covid data to their public site partway through the collection period.
-        - Currently attempting to get the data from them directly...
-
-**Weather Data**
-
-Weather data was pulled from:
-
-- DarkSky for first part of data collection period.
-- OpenWeather for last part of data collection period.
-- Important Notes:
-    - We switched data collection sources part way through the collection period.
-
-**Zoom Attendance Data (headcounts)**
-
-- Gathered directly by attending Zoom and recording attendee count by Zoom.
-    - Professor excluded from count.
-    - Excluded ourselves if we would have attended in person otherwise.
-    - TAs were left in the counts - too difficult to remove them accurately.
-    - Attendees counts were taken 10 min into the lecture, at the halfway point, and 10 min before the lecture ended.
-
-
-## Methodology
-
-#TODO (add outline comments)
-
 ## Analysis
 
-#TODO (add outline comments)
+The first basic analsyis that was conducted on the gathered data was the computation of correlation coefficients and confidence intervals to accompany them. This analysis was conducted using the following data.
 
-```{r}
-# import libraries
-# data <- read csvs
+- Zoom attendence data collected at the University of Utah
+- Temperature at 6AM and 6PM collected from OpenWeatherMaps
+- Daily confirmed case count from the Salt Lake County dataset
+- 7-day average case count from the Salt Lake County dataset
+- 7-day average positive test rate from the Salt Lake County dataset
 
-# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-# |  Date |  T+10 | T+40 | T+70 | mean(...) | Temp T-2 | Temp T-1 | Temp T-0 | Weather | Class | UU New Cases | UU 7-Day Avg New Cases | SLCo Case Rate | SLCo 7-Day Avg Case Rate| SLCo 7-Day Avg Positive Test Rate | 
-# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+The correllations being evaluated in this section of the analysis are,
 
-# regression analyses:
-#   - stimulus: nominal_weather, response: mean_attendance
-#     - logistic regression(?)
-#   - stimulus: temperature ->
-#     - linear regression
-#     - T-2 -> mean_attendance
-#     - T-1 -> mean_attendance
-#     - T-0 -> mean_attendance
-#   - stimulus: COVID... ->
-#     - linear regression
-#     - uu_new_cases -> mean_attendance
-#     - uu_new_cases_7day_avg -> mean_attendance
-#     - slco_case_rate -> mean_attendance
-#     - slco_case_rate_7day_avg -> mean_attendance
-#     - slco_pos_test_rate_7day_avg -> mean_attendance
-#   - more?
+- Mean Attendence Rate vs Mean Daily Temperature
+- Mean Attendence Rate vs Daily Confirmed New Case Count in Salt Lake County
+- Mean Attendence Rate vs 7-Day Average Confirmed New Case Count in Salt Lake County
+- Mean Attendence Rate vs 7-Day Average Positive Test Rate in Salt Lake County
 
-# correlation coefficients
-#   - confidence interval
-#   - point estimate
-```
+To determine an attendance rate for each day Zoom attendence was recorded, an attendence rate was calculated for each class using the current enrollment for the associated class before these enrollment rates were averaged for each day on record.
 
-```{r}
+Due to the complexity of calculating correlation coefficients for each of the courses based on temperature data collected for a specific time before each class began, the 6AM and 6PM temperatures were averaged to get an average daily temperature for the time period during which the classes were in session.
+
+```{r, echo=FALSE}
 # READING IN DATA
 
 atd_and_weather_data = read.csv("data/3130 Final Project Data Sheet - Atd & Weather.csv")
@@ -125,15 +37,7 @@ atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean A
 
 ```
 
-```{R}
-# GENERATING VISUALIZATIONS
-
-
-
-
-```
-
-```{R}
+```{r, echo=FALSE}
 # FUNCTIONS
 
 # Confidence Interval Calculation: https://www.statology.org/confidence-interval-correlation-coefficient/
@@ -182,7 +86,9 @@ CI_Lower = function(log_lower_bound) {
 
 ```
 
-```{r}
+After the above averages were calcualted, a Fisher Transformation was performed on the data set pairs listed above to generate approximately normally distributed data to be used in calculating the correlation coefficnets for each of the associated pairs.
+
+```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
 
 # Find the Correlation Coefficent
@@ -207,7 +113,7 @@ CI_lower_atd_vs_temp = CI_Lower(log_lower_bound)
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INFERVALS FOR mean_daily_atd_rate --- daily_confirmed_case_count
 
 # Find the Correlation Coefficent
@@ -232,7 +138,7 @@ CI_lower_atd_vs_case_count = CI_Lower(log_lower_bound)
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- confirmed_case_count_7d_avg (confirmed_7dcc)
 
 # Find the Correlation Coefficent
@@ -257,7 +163,7 @@ CI_lower_atd_vs_confirmed_7dcc = CI_Lower(log_lower_bound)
 
 ```
 
-```{r}
+```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- positive_test_rate_7d_avg (positive_7dtr)
 
 # Find the Correlation Coefficent
@@ -282,13 +188,3 @@ CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
 
 ```
 
-
-
-
-## Limitations
-
-#TODO (add outline comments)
-
-## Conclusions
-
-#TODO (add outline comments)
