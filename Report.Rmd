@@ -86,8 +86,6 @@ CI_Lower = function(log_lower_bound) {
 
 ```
 
-After the above averages were calcualted, a Fisher Transformation was performed on the data set pairs listed above to generate approximately normally distributed data to be used in calculating the correlation coefficnets for each of the associated pairs.
-
 ```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
 
@@ -187,4 +185,24 @@ CI_upper_atd_vs_positive_7dtr = CI_Upper(log_upper_bound)
 CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
 
 ```
+
+
+A Pearson correlation coefficient was calculated for each of the dataset paris and a Fisher Transformation was performed on the result to yield a normally distributed variable.
+
+A 95% confidence interval was then calcuated for each of the correlation coefficients and the upper and lower bounds of those intervals was determined.
+
+The following are the results of this analysis:
+
+- Mean Attendence Rate vs Mean Daily Temperature
+    - Correlation Coefficient: `r round(mean_daily_temp_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_temp, 4)`, `r round(CI_upper_atd_vs_temp, 4)`
+- Mean Attendence Rate vs Daily Confirmed New Case Count in Salt Lake County
+    - Correlation Coefficient: `r round(mean_daily_case_count_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_case_count, 4)`, `r round(CI_upper_atd_vs_case_count, 4)`
+- Mean Attendence Rate vs 7-Day Average Confirmed New Case Count in Salt Lake County
+    - Correlation Coefficient: `r round(mean_daily_confirmed_7dcc_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_confirmed_7dcc, 4)`, `r round(CI_upper_atd_vs_confirmed_7dcc, 4)`
+- Mean Attendence Rate vs 7-Day Average Positive Test Rate in Salt Lake County
+    - Correlation Coefficient: `r round(mean_daily_positive_7dtr_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_positive_7dtr, 4)`, `r round(CI_upper_atd_vs_positive_7dtr, 4)`
 
