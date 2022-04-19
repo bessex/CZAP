@@ -1,11 +1,15 @@
 ---
-title: "Final Project..."
+title: "In the age of COVID, what predicts Zoom lecture attendance?"
 author: "Ben Essex, Derek Che, & Chris Marston"
-date: 04/02/2022
+date: 04/22/2022
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(GGally)
 ```
 
 *******************************
@@ -118,12 +122,175 @@ Weather data was pulled from:
 ```
 
 ```{r}
-# READING IN DATA
+# define dyplyr-able function to calcuate r^2
+rsq <- function(.data, x, y) {
+    rsq_(.data, lazyeval::lazy(x), lazyeval::lazy(y))
+}
+
+# define corrolary function_ since we're using non-standard evaluation (NSE)
+rsq_ <- function(.data, x, y) {
+    require(lazyeval)
+    summary(lm(lazy_eval(x, .data)~lazy_eval(y, .data)))$r.squared
+}
+
+# calculate mean attendance and include NA
+# calculate attendance rate based on number enrolled
+# convert course into a factor
+data <- read.csv("data/atd_weather_full.csv") %>%
+    rowwise() %>%
+    mutate(mean_atd = mean(c(atd_start, atd_mid, atd_end))) %>%
+    mutate(atd_rate = mean_atd / enrolled) %>%
+    mutate(course = factor(course)) %>%
+    mutate(weather = factor(weather)) %>%
+    mutate(date = as.Date(date, "%m/%d/%Y")) %>%
+    mutate(mean_temp = mean(temp_tm2, temp_tm1, temp_tm0, na.rm = TRUE))
+
+data %>%
+    rsq(atd_rate, temp_tm2)
+
+# let's focus on a handful of variables to start
+data_filtered <- data %>%
+    select(date, course, atd_rate, mean_temp,
+           uu_new_cases, uu_new_cases_7da)
+
+# this will be the general format for performing some
+# exploratory analysis on variable pairs
+p3500 <- data_filtered %>%
+    filter(course == 3500) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "3500 Pairs")
+```
+
+```{r, include=FALSE}
+p3130 <- data_filtered %>%
+    filter(course == 3130) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "3130 Pairs")
+
+p3200 <- data_filtered %>%
+    filter(course == 3200) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "3200 Pairs")
+
+p4400 <- data_filtered %>%
+    filter(course == 4400) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "4400 Pairs")
+    
+p5140 <- data_filtered %>%
+    filter(course == 5140) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "5140 Pairs")
+
+```
+
+```{r, warning=FALSE}
+# now plot each of these:
+ggplotly(p3500)
+ggplotly(p3130)
+ggplotly(p3200)
+ggplotly(p4400)
+ggplotly(p5140)
+```
+
+```{r}
+data %>%
+    ggplot(aes(temp_tm2, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+
+data %>%
+    ggplot(aes(temp_tm1, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+
+data %>%
+    ggplot(aes(temp_tm0, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+
+data_filtered %>%
+    filter(course == "3130") %>%
+    lattice::splom()
+
+data_filtered %>%
+    filter(course == "3500") %>%
+    lattice::splom()
+
+cor(data$temp_tm2, data$atd_rate, use = "complete.obs")
+rsq(data, atd_rate, temp_tm2)
+
+data %>%
+    ggplot(aes(temp_tm1, atd_rate)) +
+    geom_point() +
+    geom_smooth(method = "lm")
+
+data %>%
+    filter(course == 3500) %>%
+    ggplot(aes(temp_tm1, mean_atd)) +
+    geom_point() +
+    geom_smooth(method = "lm")
+
+
+data %>%
+    filter(course == 3500) %>%
+    ggplot(aes(as.Date(date, "%m/%d/%Y"), mean_atd)) +
+    geom_point() +
+    geom_smooth(method = "lm")
+
+# data_ben_3500 <- data_ben %>% 
+#     filter(course == 3500) %>%
+#     mutate(date = as.Date(date, "%m/%d/%Y")) %>%
+#     rowwise() %>%
+#     mutate(date_temp_tm2_ixn = as.numeric(date) * temp_tm2)
+
+# cor(as.numeric(data_ben_3500$date), data_ben_3500$mean_atd, use = "complete.obs")
+# rsq(data_ben_3500$date, data_ben_3500$mean_atd)
+# rsq(data_ben_3500$date_temp_tm2_ixn, data_ben_3500$mean_atd)
+# rsq(data_ben_3500$temp_tm2, data_ben_3500$mean_atd)
+
+cor(data$temp_tm2, data$atd_rate, use = "complete.obs")
+rsq(data, atd_rate, temp_tm2)
+
+data %>%
+    ggplot(aes(temp_tm0, atd_rate)) +
+    geom_point() +
+    geom_smooth(method = "lm")
+
+cor(data$temp_tm2, data$atd_rate, use = "complete.obs")
+rsq(data, atd_rate, temp_tm2)
+
+data %>%
+    ggplot(aes(date, atd_rate)) +
+    geom_point() +
+    geom_smooth(method = "lm")
 
 atd_and_weather_data = read.csv("data/3130 Final Project Data Sheet - Atd & Weather.csv")
 atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
 
 ```
+
+
 
 ```{R}
 # GENERATING VISUALIZATIONS
