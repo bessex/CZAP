@@ -95,22 +95,112 @@ Weather data was pulled from:
 
 ## Analysis
 
-Let us examine what the data looks like.
+Let us first look at the general trends of the data. 
+
+### Temperature
+
+TODO: include note how mean daily temp was calculated.
 
 ```{r}
-data = read.csv("./Data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
-boxplot(data$mean_daily_atd_rate)
-title(main = "Mean Daily Attendance Rate")
-boxplot(data$temp_6am)
-title(main = "Temperature 6am")
-boxplot(data$temp_6pm)
-title(main = "Temperature 6pm")
-boxplot(data$mean_daily_temp)
-title(main = "Mean Daily Temp")
+gData = read.csv("./Data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
+gData$date = as.Date(gData$date_2, format = "%m/%d/%Y")
+
+accumulate_by <- function(dat, var) {
+  var <- lazyeval::f_eval(var, dat)
+  lvls <- plotly:::getLevels(var)
+  dats <- lapply(seq_along(lvls), function(x) {
+    cbind(dat[var %in% lvls[seq(1, x)], ], frame = lvls[[x]])
+  })
+  dplyr::bind_rows(dats)
+}
+
+gData = gData %>% accumulate_by(~date)
+
+pAvgTemp = ggplot(gData, aes(x=date, y=mean_daily_temp, frame=frame)) + geom_line() + labs(title="Mean Daily Temperature Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Temperature (F)") + geom_smooth(method = "lm")
+
+ggplotly(pAvgTemp) %>% 
+  animation_opts(
+    frame = 100, 
+    transition = 0, 
+    redraw = FALSE
+  ) %>%
+  animation_slider(
+    currentvalue = list(
+      prefix = "Date"
+    )
+  )
 ```
+
+From the graph above, we can see that the average temperature increases as the semester went on. This makes sense as the semester began in the winter and progressed into spring. Interestingly, we can see two extremely cold days on February 3rd (21 degrees) and February 23 (20 degrees) and one abnormally warm day on March 3 (56.5 degrees).
+
+Thus, we can conclude that temperatures were generally increasing as the semester progressed.
+
+### COVID Case Rates
+
+First, we will look at the average number of daily case counts.
+
+```{r}
+pAvgTemp = ggplot(gData, aes(x=date, y=daily_confirmed_case_count)) + geom_line() + labs(title="Mean Daily COVID Case Counts Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Case Counts") + geom_smooth(method = "loess")
+
+ggplotly(pAvgTemp)
+```
+
+Here, we can see that the number of daily COVID cases dropped exponentially when comparing the beginning and end of the semester. This could be explained by increasing vaccination rates, people being more cautious, or 
+people not caring enough to get tested. Regardless of the reason, we can clearly see a downwards trend in COVID cases.
+
+We can then look at the confirmed case count seven day average.
+
+```{r}
+pAvgTemp = ggplot(gData, aes(x=date, y=positive_test_rate_7d_avg)) + geom_line() + labs(title="Positive Test Rate 7 Day Average Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Positive Test Rate") + geom_smooth(method = "loess")
+
+ggplotly(pAvgTemp)
+```
+
+The graph above shows a linear trend of decreasing positive test rates as the semester progresses. 
+
+Thus, these two graphs support the hypothesis that COVID rates decreased over time. 
+
+### Zoom Attendance Data
 
 ```{r}
 library(ggplot2)
+library(plotly)
+par(mar = c(4, 4, .1, .1))
+
+attData = read.csv("./Data/3130 Final Project Data Sheet - Atd & Weather.csv")
+attData$date = as.Date(attData$date, format = "%m/%d/%Y")
+courseAttData = split(attData, f=attData$course)
+
+p3130 <- ggplot(courseAttData$`3130`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+
+p3200 <- ggplot(courseAttData$`3200`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+
+p3500 <- ggplot(courseAttData$`3500`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+
+p4400 <- ggplot(courseAttData$`4400`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+
+p5140 <- ggplot(courseAttData$`5140`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+
+fig = subplot(p3130, p3200, p3500, p4400, p5140, nrows=3, margin=0.07, titleY = TRUE) %>%
+  layout(title = "Mean Zoom Attendance Between Jan 18, 2022 to Mar 24, 2022 for Courses")
+ann = list(list(x = 0.15 , y = 1.01, text = "CS 3130", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.85 , y = 1.01, text = "CS 3200", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.15 , y = 0.61, text = "CS 3500", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.85 , y = 0.61, text = "CS 4400", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.15 , y = 0.21, text = "CS 5140", showarrow = F, xref='paper', yref='paper')
+           )
+fig = fig %>% layout(annotations = ann)
+
+fig
+```
+
+From the plots above, we can see that Zoom attendance varies wildly between different courses with many peaks and troughs. However, the one exception is CS 3200 where we can see that the number of Zoom attendees generally decreases as the semester went on. Otherwise, the other courses displayed a general trend of a relatively constant number of Zoom people throughout the semester. One common attribute shared among all the graphs was that the number of attendance dropped near March 1st. 
+
+Thus, we can conclude that the Zoom attendance rates remained mostly relatively constant throughout the semester.
+
+```{r}
+library(ggplot2)
+
 data$date_2 = as.Date(data$date_2, format = "%m/%d/%Y")
 ggplot(data, aes(x=date_2)) +
 geom_line(aes(y=mean_daily_atd_rate)) + labs(title = "Mean Daily Attendance Rate Over Time", subtitle = "Jan 18, 2022 to Mar 24, 2022", y = "Attendance Count", x = "Date")
