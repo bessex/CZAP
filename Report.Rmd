@@ -91,35 +91,9 @@ Weather data was pulled from:
 
 #TODO (add outline comments)
 
-```{r}
-# import libraries
-# data <- read csvs
+In performing a more in-depth analysis with Pearson correlations, we must first define a function to calculate the Pearson coefficient of determination, or $r^2$. This number, which will fall between 0 and 1, shows what percentage of the variation in the response (dependent) variable is explained by the explanatory (independent) variable.
 
-# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-# |  Date |  T+10 | T+40 | T+70 | mean(...) | Temp T-2 | Temp T-1 | Temp T-0 | Weather | Class | UU New Cases | UU 7-Day Avg New Cases | SLCo Case Rate | SLCo 7-Day Avg Case Rate| SLCo 7-Day Avg Positive Test Rate | 
-# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-# regression analyses:
-#   - stimulus: nominal_weather, response: mean_attendance
-#     - logistic regression(?)
-#   - stimulus: temperature ->
-#     - linear regression
-#     - T-2 -> mean_attendance
-#     - T-1 -> mean_attendance
-#     - T-0 -> mean_attendance
-#   - stimulus: COVID... ->
-#     - linear regression
-#     - uu_new_cases -> mean_attendance
-#     - uu_new_cases_7day_avg -> mean_attendance
-#     - slco_case_rate -> mean_attendance
-#     - slco_case_rate_7day_avg -> mean_attendance
-#     - slco_pos_test_rate_7day_avg -> mean_attendance
-#   - more?
-
-# correlation coefficients
-#   - confidence interval
-#   - point estimate
-```
+Since we are using `dplyr` for much of this analysis, we can define the function using `lazyeval` to enable the non-standard evaluation used by `dplyr`.
 
 ```{r}
 # define dyplyr-able function to calcuate r^2
@@ -132,10 +106,17 @@ rsq_ <- function(.data, x, y) {
     require(lazyeval)
     summary(lm(lazy_eval(x, .data)~lazy_eval(y, .data)))$r.squared
 }
+```
 
-# calculate mean attendance and include NA
-# calculate attendance rate based on number enrolled
+With this function defined, we ingest the raw data and appropriately transform, or "wrangle" it, such that we are able to vizualize and analyze it.
+
+```{r}
+# compute mean attendance and propagate NA
+# compute attendance rate based on number enrolled
 # convert course into a factor
+# convert weather into a factor
+# make date R-readable
+# compute mean of temps 2 hours before class
 data <- read.csv("data/atd_weather_full.csv") %>%
     rowwise() %>%
     mutate(mean_atd = mean(c(atd_start, atd_mid, atd_end))) %>%
@@ -144,17 +125,72 @@ data <- read.csv("data/atd_weather_full.csv") %>%
     mutate(weather = factor(weather)) %>%
     mutate(date = as.Date(date, "%m/%d/%Y")) %>%
     mutate(mean_temp = mean(temp_tm2, temp_tm1, temp_tm0, na.rm = TRUE))
+```
 
-data %>%
-    rsq(atd_rate, temp_tm2)
+Now that the data has been ingested, we pare down our explanatory variables to only those at the interval level of measurement. This includes: `mean_temp`, which represents the mean of temperature 2 hours before, 1 hour before, and at the time class begins; `uu_new_cases`, which represents the number of daily new COVID cases were recorded at the University of Utah; and `uu_new_cases_7da`, which represents a rolling, 7-day average of daily new COVID cases recorded at the University of Utah. We also include `atd_rate`, our response variable, which we compute by taking the mean of Zoom lecture attendees at each of our three data points, then dividing this number by the number of students enrolled in the course at the end of the data collection period.
 
-# let's focus on a handful of variables to start
+Our goal here is to begin by focusing on only a handful of variables, which we hope will allow us to quickly see trends and correlations across many pairs of variables.
+
+```{r}
+# filtering down to a choice few variables
 data_filtered <- data %>%
     select(date, course, atd_rate, mean_temp,
            uu_new_cases, uu_new_cases_7da)
+```
 
-# this will be the general format for performing some
-# exploratory analysis on variable pairs
+With our data fully transformed, we can begin to plot correlations. The quickest way bootstrap this process is by making a scatter plot with `ggplot2` and visually inspecting the initial results.
+
+```{r}
+# begin by looking at mean temp
+data_filtered %>%
+    ggplot(aes(mean_temp, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+```
+
+When we begin by looking at the correlation between `mean_temp` and `atd_rate`, shown above, we immediately see class-wise trends emerge. Even with bands of standard error, we see a fairly good fit for 4400, which trends slightly upward, and for 3500, which trends sideways. 3200, despite having wider error bounds, seems to mostly trend downward. Since we see different trends with different classes, it suggests class could be confounding variable we hadn't earlier considered. This reality highlights the possibility that there may be unmeasured characteristics of the class itself that may interact with `mean_temp` and a student's likelihood to attend class via Zoom. For example, it's possible that for difficult or very important classes, students are relatively "inelastic", or un-sensitive, to changes in weather, preferring to always attend in person. While we should nod to this possibility, we lack the data and instrumentation to fully capture this variable and decompose it into its atomic parts, which is a limitation of this study.
+
+We can continue with `ggplot2`, now looking at `uu_new_cases` and `uu_new_cases_7da` as explanatory variables.
+
+```{r,warning=FALSE}
+# Explanatory: `uu_new_cases`
+data_filtered %>%
+    ggplot(aes(uu_new_cases, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+
+# Explanatory: `uu_new_cases_7da`
+data_filtered %>%
+    ggplot(aes(uu_new_cases_7da, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+```
+
+For `uu_new_cases`, the first thing we notice is that there are very few data points at the very high end of the x-axis. This is because, toward the beginning of our data collection period, there were 1 or 2 days of collection that occurred right at the end of a COVID surge. For 3200 and 4400, we see that the trend-lines do not even extend beyond around 50 cases. Since data collection for these classes began just a day or two after the surge had already dropped back down, no observations exist here at the higher end of our explanatory variable for these classes. Furthermore, with so few data at this high end, the error margins are too large for us to draw any preliminary conclusions from these trends. We might look at 5140, for which Zoom attendance rate appears to increase perhaps linearly or logarithmically with daily new cases. But then we could also look at 3500, for example, for which Zoom attendance rate almost certainly decreases with the daily case count.
+
+If we look at the 7-day average, `uu_new_cases_7da`, we get slightly more interesting results. Again, margins of error here make our results from 5140 and 3130 not immediately useful to us. However, we can see trends emerging again from 3200, 4400, and 3500, for which Zoom attendance rate appears to increase, move sideways, and decrease with average cases, respectively.
+
+With some initial trends in mind, we can begin computing correlation pairs for each class. This is a way to get slightly better depth of information, though we're still in the exploratory stage of looking at the gathered data.
+
+```{r}
+# This will be the general format for performing some
+# exploratory analysis on variable pairs.
+# We do this for each class.
 p3500 <- data_filtered %>%
     filter(course == 3500) %>%
     select(!course) %>%
@@ -189,53 +225,74 @@ p5140 <- data_filtered %>%
 
 ```
 
+Now that we have prepared our plots, we can plot them one-by-one.
+
 ```{r, warning=FALSE}
-# now plot each of these:
 ggplotly(p3500)
+```
+
+With 3500, we see a few interesting correlations. We see `uu_new_cases_7da` has a significant negative correlation with `atd_rate` ($p < 0.001$), `uu_new_cases` with `atd_rate` ($p < 0.01$). Mean temperature seems to have no significance here.
+
+```{r, warning=FALSE}
 ggplotly(p3130)
+```
+
+With 3130, we see no interesting correlations of any significance. We see a correlation between `uu_new_cases_7da` and `uu_new_cases`, which we would expect for trivial reasons. We also see a correlation between case rates and date, which supports an assumption we alluded to earlier--that case rates have mostly decreased as the data collection period went on.
+
+```{r, warning=FALSE}
 ggplotly(p3200)
+```
+
+With 3200, we see some correlations of significance. `uu_new_cases_7da` and `uu_new_cases` appear to have strong positive correlations with `atd_rate` ($p < 0.01$), and `mean_temp` a slightly weaker, negative correlation with `atd_rate` ($p < 0.01$). We also see a correlation between `atd_rate` and `date` ($p < 0.001$), which, since case rates also correlate with date, makes it difficult to infer causality in the earlier correlations. What looks like COVID case rates predicting attendance might in fact be dropping Zoom attendance as the semester goes on, unrelated to COVID case numbers.
+
+```{r, warning=FALSE}
 ggplotly(p4400)
+```
+
+For 4400, we see a fairly strong positive correlation between `mean_temp` and `atd_rate` ($p < 0.01$) and between `date` and `atd_rate` ($p < 0.01$).
+
+```{r, warning=FALSE}
 ggplotly(p5140)
 ```
 
+Finally, for 5140, we see essentially no correlations of interest and significance.
+
+
 ```{r}
-data %>%
-    ggplot(aes(temp_tm2, atd_rate, color = course)) +
-    geom_point() +
-    geom_smooth(method = "lm") +
-    scale_color_manual(values = c("3130" = "purple",
-                                  "3200" = "red",
-                                  "5140" = "green",
-                                  "3500" = "orange",
-                                  "4400" = "blue"))
+data_3500 <- data_filtered %>%
+    filter(course == 3500)
 
-data %>%
-    ggplot(aes(temp_tm1, atd_rate, color = course)) +
-    geom_point() +
-    geom_smooth(method = "lm") +
-    scale_color_manual(values = c("3130" = "purple",
-                                  "3200" = "red",
-                                  "5140" = "green",
-                                  "3500" = "orange",
-                                  "4400" = "blue"))
+cor(data_3500$uu_new_cases_7da, data_3500$atd_rate, use = "complete.obs")
 
-data %>%
-    ggplot(aes(temp_tm0, atd_rate, color = course)) +
-    geom_point() +
-    geom_smooth(method = "lm") +
-    scale_color_manual(values = c("3130" = "purple",
-                                  "3200" = "red",
-                                  "5140" = "green",
-                                  "3500" = "orange",
-                                  "4400" = "blue"))
 
-data_filtered %>%
-    filter(course == "3130") %>%
-    lattice::splom()
+cor(data_filtered$uu_new_cases_7da, data_filtered$atd_rate, use = "complete.obs")
+# data %>%
+#     ggplot(aes(temp_tm1, atd_rate, color = course)) +
+#     geom_point() +
+#     geom_smooth(method = "lm") +
+#     scale_color_manual(values = c("3130" = "purple",
+#                                   "3200" = "red",
+#                                   "5140" = "green",
+#                                   "3500" = "orange",
+#                                   "4400" = "blue"))
 
-data_filtered %>%
-    filter(course == "3500") %>%
-    lattice::splom()
+# data %>%
+#     ggplot(aes(temp_tm0, atd_rate, color = course)) +
+#     geom_point() +
+#     geom_smooth(method = "lm") +
+#     scale_color_manual(values = c("3130" = "purple",
+#                                   "3200" = "red",
+#                                   "5140" = "green",
+#                                   "3500" = "orange",
+#                                   "4400" = "blue"))
+
+# data_filtered %>%
+#     filter(course == "3130") %>%
+#     lattice::splom()
+
+# data_filtered %>%
+#     filter(course == "3500") %>%
+#     lattice::splom()
 
 cor(data$temp_tm2, data$atd_rate, use = "complete.obs")
 rsq(data, atd_rate, temp_tm2)
@@ -258,17 +315,6 @@ data %>%
     geom_point() +
     geom_smooth(method = "lm")
 
-# data_ben_3500 <- data_ben %>% 
-#     filter(course == 3500) %>%
-#     mutate(date = as.Date(date, "%m/%d/%Y")) %>%
-#     rowwise() %>%
-#     mutate(date_temp_tm2_ixn = as.numeric(date) * temp_tm2)
-
-# cor(as.numeric(data_ben_3500$date), data_ben_3500$mean_atd, use = "complete.obs")
-# rsq(data_ben_3500$date, data_ben_3500$mean_atd)
-# rsq(data_ben_3500$date_temp_tm2_ixn, data_ben_3500$mean_atd)
-# rsq(data_ben_3500$temp_tm2, data_ben_3500$mean_atd)
-
 cor(data$temp_tm2, data$atd_rate, use = "complete.obs")
 rsq(data, atd_rate, temp_tm2)
 
@@ -284,7 +330,10 @@ data %>%
     ggplot(aes(date, atd_rate)) +
     geom_point() +
     geom_smooth(method = "lm")
+```
 
+
+```{r}
 atd_and_weather_data = read.csv("data/3130 Final Project Data Sheet - Atd & Weather.csv")
 atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
 
