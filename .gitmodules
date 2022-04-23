@@ -1,0 +1,3 @@
+[submodule "cs3130-project-helper"]
+	path = cs3130-project-helper
+	url = https://github.com/bessex/cs3130-project-helper
