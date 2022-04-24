@@ -1,0 +1,249 @@
+---
+title: "What predicts Zoom lecture attendance?"
+author: "Ben Essex, Chris Marston, Derek Che"
+date: April 26, 2022
+output: 
+    ioslides_presentation:
+        css: slides.css
+---
+
+```{r install-packages, message=FALSE, warning=FALSE, include=FALSE}
+# code snippet from:
+# https://vbaliga.github.io/verify-that-r-packages-are-installed-and-loaded/
+## If a package is installed, it will be loaded. If any
+## are not, the missing package(s) will be installed
+## from CRAN and then loaded.
+
+## First specify the packages of interest
+packages <- c("fontawesome", "dplyr",
+              "ggplot2", "plotly",
+              "GGally", "lazyeval")
+
+## Now load or install & load all
+package_check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      install.packages(x, dependencies = TRUE)
+      library(x, character.only = TRUE)
+    }
+  }
+)
+```
+
+# Introduction
+
+## Our Questions
+
+- Do COVID case numbers affect Zoom lecture attendance?
+- Does weather affect Zoom lecture attendance?
+
+# Gathering Data
+
+## Operationalization
+
+- Weather
+    - type (☀️, ☁️, ☔, ❄️, etc.)
+    - temperature (T-2, T-1, T-0)
+- COVID (![](fig/u.png){ width=22 }<span style="color:#cc0000">Univ. of Utah</span>, Salt Lake County)
+    - Daily case numbers
+    - 7-day average
+
+## Collection: Scraper
+
+- [Scraper](https://github.com/bessex/cs3130-project-helper)
+    - `r fa("docker", fill = "steelblue")` [Docker-ized](https://www.docker.com/)
+    - `r fa("node-js", fill = "#43853d")` Built with [Node.js](https://nodejs.org)
+    - `r fa("discord", fill = "#738adb")` Reports to [Discord](https://discord.com), ✨_automatically_✨
+    - Pulls weather from [OpenWeatherMap](https://openweathermap.org/current)
+    - ~~Pulls~~ _Pulled_ from [![](fig/u.png){ width=22 } COVID Central](https://coronavirus.utah.edu/)
+
+---
+
+![](fig/weather-discord.png){ width=100% }
+
+
+## Collection: Zoom Attendance
+
+![](fig/spreadsheets2.png){ width=100% }
+
+## Plots! (1/3)
+
+- Derek's plots here
+
+## Plots! (2/3)
+
+- More of Derek's plots
+
+## Plots! (3/3)
+
+- More of Derek's plots? etc.
+
+## Analysis (1/?)
+
+- Some of Chris's analysis
+
+## Analysis (2/?) <!-- Begin Ben's section -->
+
+A different approach. 🤠 Data wrangling:
+
+<!-- 
+# compute mean attendance and propagate NA
+# compute attendance rate based on number enrolled
+# convert course into a factor
+# convert weather into a factor
+# make date R-readable
+# compute mean of temps 2 hours before class 
+-->
+
+```{r}
+data <- read.csv("data/atd_weather_full.csv") %>%
+    rowwise() %>%
+    mutate(mean_atd = mean(c(atd_start, atd_mid, atd_end))) %>%
+    mutate(atd_rate = mean_atd / enrolled) %>%
+    mutate(course = factor(course)) %>%
+    mutate(weather = factor(weather)) %>%
+    mutate(date = as.Date(date, "%m/%d/%Y")) %>%
+    mutate(mean_temp = mean(temp_tm2, temp_tm1, temp_tm0, na.rm = TRUE))
+```
+
+---
+
+First, Zoom attendance rate versus mean temp:
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+# filtering down to a choice few variables
+data_filtered <- data %>%
+    select(date, course, atd_rate, mean_temp,
+           uu_new_cases, uu_new_cases_7da)
+
+data_filtered %>%
+    ggplot(aes(mean_temp, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+```
+
+---
+
+Zoom attendance rate versus the 7-day average of new COVID cases at the ![](fig/u.png){ width=22 }:
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+data_filtered %>%
+    ggplot(aes(uu_new_cases_7da, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+```
+
+---
+
+So, does this mean me might see relationships within individual classes?
+
+...
+
+_Let's find out!_
+
+## Analysis (?/?)
+
+3200, 3500, and 4400 look promising: we'll make a plot matrix:
+
+```{r}
+p3500 <- data_filtered %>%
+    filter(course == 3500) %>%
+    select(!course) %>%
+    ggpairs() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          axis.title = element_text(size = rel(0.85))) +
+    labs(title = "3500 Pairs")
+```
+
+_(repeat as needed)_
+
+```{r, include=FALSE}
+p3200 <- data_filtered %>%
+    filter(course == 3200) %>%
+    select(!course) %>%
+    ggpairs() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          axis.title = element_text(size = rel(0.85))) +
+    labs(title = "3200 Pairs")
+
+p4400 <- data_filtered %>%
+    filter(course == 4400) %>%
+    select(!course) %>%
+    ggpairs() +
+    theme(axis.text.x = element_text(angle = 90, hjust = 1),
+          axis.title = element_text(size = rel(0.85))) +
+    labs(title = "4400 Pairs")
+```
+
+---
+
+```{r, message=FALSE, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p3500)
+```
+
+---
+
+```{r, message=FALSE, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p3200)
+```
+
+---
+
+```{r, message=FALSE, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p4400)
+```
+
+## Conclusions! ...maybe?
+
+```{r, include=FALSE}
+# define dyplyr-able function to calcuate r^2
+rsq <- function(.data, x, y) {
+    rsq_(.data, lazyeval::lazy(x), lazyeval::lazy(y))
+}
+
+# define corrolary function_ since we're using non-standard evaluation (NSE)
+rsq_ <- function(.data, x, y) {
+    require(lazyeval)
+    summary(lm(lazy_eval(x, .data)~lazy_eval(y, .data)))$r.squared
+}
+
+# bonus:
+# define dyplyr-able function to calculate Pearson correlation coefficient
+cor <- function(.data, x, y) {
+    cor_(.data, lazyeval::lazy(x), lazyeval::lazy(y))
+}
+
+# define corrolary function_ since we're using non-standard evaluation (NSE)
+cor_ <- function(.data, x, y) {
+    stats::cor(x = lazyeval::lazy_eval(x, .data),
+               y = lazyeval::lazy_eval(y, .data),
+               use = "complete.obs")
+}
+```
+
+- Zoom Attendance Rate vs. Mean Temp
+    - CS 3500: ($p > 0.05$) -- Not significant.
+    - CS 3200: $`r data %>% filter(course == 3200) %>% cor(mean_temp, atd_rate) %>% round(3)`,\ r^2 = `r data %>% filter(course == 3200) %>% rsq(mean_temp, atd_rate) %>% round(3)`$ ($p < 0.01$)
+    - CS 4400: $`r data %>% filter(course == 4400) %>% cor(mean_temp, atd_rate) %>% round(3)`,\ r^2 = `r data %>% filter(course == 4400) %>% rsq(mean_temp, atd_rate) %>% round(3)`$ ($p < 0.01$)
+
+---
+
+- Zoom Attendance Rate vs. 7-day Avg Cases at ![](fig/u.png){ width=22 }
+    - CS 3500: $`r data %>% filter(course == 3500) %>% cor(mean_temp, atd_rate) %>% round(3)`,\ r^2 = `r data %>% filter(course == 3500) %>% rsq(mean_temp, atd_rate) %>% round(3)`$ ($p < 0.001$)_!!_
+    - CS 3200: $`r data %>% filter(course == 3200) %>% cor(mean_temp, atd_rate) %>% round(3)`,\ r^2 = `r data %>% filter(course == 3200) %>% rsq(mean_temp, atd_rate) %>% round(3)`$ ($p < 0.01$)
+    - CS 4400: ($p > 0.05$) -- Not significant.
+
+## Conclusions? ...perhaps not.
+
+- Limitations too great to make assertions...

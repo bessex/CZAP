@@ -106,6 +106,19 @@ rsq_ <- function(.data, x, y) {
     require(lazyeval)
     summary(lm(lazy_eval(x, .data)~lazy_eval(y, .data)))$r.squared
 }
+
+# bonus:
+# define dyplyr-able function to calculate Pearson correlation coefficient
+cor <- function(.data, x, y) {
+    cor_(.data, lazyeval::lazy(x), lazyeval::lazy(y))
+}
+
+# define corrolary function_ since we're using non-standard evaluation (NSE)
+cor_ <- function(.data, x, y) {
+    stats::cor(x = lazyeval::lazy_eval(x, .data),
+               y = lazyeval::lazy_eval(y, .data),
+               use = "complete.obs")
+}
 ```
 
 With this function defined, we ingest the raw data and appropriately transform, or "wrangle" it, such that we are able to vizualize and analyze it.
