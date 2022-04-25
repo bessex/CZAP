@@ -117,16 +117,17 @@ package_check <- lapply(
 
 - More of Derek's plots? etc.
 
-## Preliminary Analysis (1/?)
+## Analysis (1/3)
 
-- Data
-    - Zoom attendence
-    - Daily new case counts SL County
-    - 7-day average new case count
-    - 7-day average positive test rate
-    - Average daily temperature
+Data
 
-## Preliminary Analysis (2/?)
+- Zoom attendance
+- Daily new case counts SL County
+- 7-day average new case count SL County
+- 7-day average positive test rate SL County
+- Average daily temperature SL City
+
+## Analysis (2/3)
 
 - Mean Daily Attendance Rate
     - Aggregated course Zoom attendance into single attendance rate for each day
@@ -134,9 +135,18 @@ package_check <- lapply(
 - Fisher transformation applied to yield a normally distributed variable
 - 95% confidence interval calculated for each correlation coefficient
 
-## Preliminary Analysis (3/?)
+## Analysis Results? (3/3)
 
-- TODO: Insert results
+- Mean Atd Rate vs Mean Daily Temperature
+    - CC: -0.0392 & CI: -0.3725, 0.3029
+- Mean Atd Rate vs Daily Confirmed New Case Count in SL County
+    - CC: -0.1932 & CI: -0.4987, 0.1551
+- Mean Atd Rate vs 7-Day Average Confirmed New Case Count in SL County
+    - CC: -0.1064 & CI: -0.4291, 0.2404
+- Mean Atd Rate vs 7-Day Average Positive Test Rate in SL County
+    - CC: -0.0472 & CI: -0.3793, 0.2957
+
+No correlation? Inconclusive?
 
 ## Analysis (2/?) <!-- Begin Ben's section -->
 
