@@ -67,6 +67,44 @@ package_check <- lapply(
 
 ![](fig/spreadsheets2.png){ width=100% }
 
+## Collection: Zoom Attendance
+
+- Zoom attendence recorded via Zoom headcount
+- Recorded at
+    - 10 min after start
+    - Half-way
+    - 10 min before end
+- Minus one for professor
+- Minus one for researcher (us)
+- Left TAs in the count
+
+## Collection: University of Utah Covid Data
+
+- Available on U of U Covid infomration page
+- Total new cases and 7-day avearge new cases
+    - Among faculty, staff, and students
+- U of U stopped posting data on March 3rd
+    - Couldn't get data retroactively
+- Scraper used to collect data
+
+## Collection: Salt Lake County Covid Data
+
+- COVID-19 data downloaded from the [![](fig/u.png){ width=22 } COVID Central](https://coronavirus.utah.edu/)
+    - Daily new case counts
+    - 7-day average new cases
+    - 7-day average percent positive test rate
+- Used Salt Lake County entries
+
+## Weather Data
+
+- Collected from [OpenWeatherMap](https://openweathermap.org/current)
+- Weather type (☀️, ☁️, ☔, ❄️, etc.)
+    - Collected 2hrs before class started
+- Temperature
+    - Collected 0hrs, 1hr, and 2hrs before class
+    - Average daily temperature
+- Used scraper to collect data
+
 ## Plots! (1/3)
 
 - Derek's plots here
@@ -79,9 +117,26 @@ package_check <- lapply(
 
 - More of Derek's plots? etc.
 
-## Analysis (1/?)
+## Preliminary Analysis (1/?)
 
-- Some of Chris's analysis
+- Data
+    - Zoom attendence
+    - Daily new case counts SL County
+    - 7-day average new case count
+    - 7-day average positive test rate
+    - Average daily temperature
+
+## Preliminary Analysis (2/?)
+
+- Mean Daily Attendance Rate
+    - Aggregated course Zoom attendance into single attendance rate for each day
+- Pearson correlation coefficient calculated
+- Fisher transformation applied to yield a normally distributed variable
+- 95% confidence interval calculated for each correlation coefficient
+
+## Preliminary Analysis (3/?)
+
+- TODO: Insert results
 
 ## Analysis (2/?) <!-- Begin Ben's section -->
 
