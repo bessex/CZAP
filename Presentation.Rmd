@@ -70,6 +70,8 @@ package_check <- lapply(
 
 ## Collection: Zoom Attendance
 
+<!-- TODO: mention classes included in collection -->
+
 - Zoom attendence recorded via Zoom headcount
 - Recorded at
     - 10 min after start
@@ -187,8 +189,8 @@ Data
 
 - Mean Daily Attendance Rate
     - Aggregated course Zoom attendance into single attendance rate for each day
-- Pearson correlation coefficient calculated
 - Fisher transformation applied to yield a normally distributed variable
+- Pearson correlation coefficient calculated
 - 95% confidence interval calculated for each correlation coefficient
 
 ## Analysis Results? (3/3)
@@ -204,7 +206,7 @@ Data
 
 No correlation? Inconclusive?
 
-## Analysis (2/?) <!-- Begin Ben's section -->
+## Analysis (4/3) <!-- Begin Ben's section -->
 
 A different approach. 🤠 Data wrangling:
 
@@ -273,7 +275,7 @@ So, does this mean me might see relationships within individual classes?
 
 _Let's find out!_
 
-## Analysis (?/?)
+## Analysis (5/3)
 
 3200, 3500, and 4400 look promising: we'll make a plot matrix:
 
