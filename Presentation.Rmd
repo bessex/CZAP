@@ -134,12 +134,14 @@ ggplotly(pAvgTemp) %>%
   )
 ```
 
-## COVID Case Rates
+## Mean Daily COVID Case Rates
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 pAvgTemp = ggplot(gData, aes(x=date, y=daily_confirmed_case_count)) + geom_line() + labs(title="Mean Daily COVID Case Counts Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Case Counts") + geom_smooth(method = "loess")
 ggplotly(pAvgTemp)
 ```
+
+## COVID Positive Test Rate 7 Day Average
 
 ```{r, message=FALSE, warning=FALSE, echo=FALSE}
 pAvgTemp = ggplot(gData, aes(x=date, y=positive_test_rate_7d_avg)) + geom_line() + labs(title="Positive Test Rate 7 Day Average Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Positive Test Rate") + geom_smooth(method = "loess")
@@ -156,14 +158,14 @@ par(mar = c(4, 4, .1, .1))
 attData = read.csv("./data/3130 Final Project Data Sheet - Atd & Weather.csv")
 attData$date = as.Date(attData$date, format = "%m/%d/%Y")
 courseAttData = split(attData, f=attData$course)
-p3130 <- ggplot(courseAttData$`3130`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
-p3200 <- ggplot(courseAttData$`3200`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
-p3500 <- ggplot(courseAttData$`3500`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
-p4400 <- ggplot(courseAttData$`4400`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
-p5140 <- ggplot(courseAttData$`5140`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+p3130 <- ggplot(courseAttData$`3130`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm", se=FALSE)
+p3200 <- ggplot(courseAttData$`3200`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm", se=FALSE)
+p3500 <- ggplot(courseAttData$`3500`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm", se=FALSE)
+p4400 <- ggplot(courseAttData$`4400`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm", se=FALSE)
+p5140 <- ggplot(courseAttData$`5140`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm", se=FALSE)
 fig = subplot(p3130, p3200, p3500, p4400, p5140, nrows=3, margin=0.07, titleY = TRUE) %>%
   layout(title = "Mean Zoom Attendance Between Jan 18, 2022 to Mar 24, 2022 for Courses")
-ann = list(list(x = 0.15 , y = 1.01, text = "CS 3130", showarrow = F, xref='paper', yref='paper'),
+ann = list(list(x = 0.2 , y = 1.01, text = "CS 3130", showarrow = F, xref='paper', yref='paper'),
            list(x = 0.85 , y = 1.01, text = "CS 3200", showarrow = F, xref='paper', yref='paper'),
            list(x = 0.15 , y = 0.61, text = "CS 3500", showarrow = F, xref='paper', yref='paper'),
            list(x = 0.85 , y = 0.61, text = "CS 4400", showarrow = F, xref='paper', yref='paper'),
