@@ -80,8 +80,8 @@ package_check <- lapply(
 
 ## Collection: University of Utah Covid Data
 
-- Available on U of U Covid infomration page
-- Total new cases and 7-day avearge new cases
+- Available on U of U Covid information page
+- Total new cases and 7-day average new cases
     - Among faculty, staff, and students
 - U of U stopped posting data on March 3rd
     - Couldn't get data retroactively
