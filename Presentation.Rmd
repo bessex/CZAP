@@ -72,6 +72,7 @@ package_check <- lapply(
 
 <!-- TODO: mention classes included in collection -->
 
+- CS 3200, 4400, 3130, 3500, 5140
 - Zoom attendence recorded via Zoom headcount
 - Recorded at
     - 10 min after start
@@ -92,7 +93,7 @@ package_check <- lapply(
 
 ## Collection: Salt Lake County Covid Data
 
-- COVID-19 data downloaded from the [![](fig/u.png){ width=22 } COVID Central](https://coronavirus.utah.edu/)
+- COVID-19 data downloaded from the [Utah COVID-19 Dashboard](https://coronavirus-dashboard.utah.gov/overview.html)
     - Daily new case counts
     - 7-day average new cases
     - 7-day average percent positive test rate
@@ -181,17 +182,16 @@ fig
 
 Data
 
-- Zoom attendance
+- Zoom attendance rates
 - Daily new case counts SL County
 - 7-day average new case count SL County
 - 7-day average positive test rate SL County
-- Average daily temperature SL City
+- Average daily temperature SLC
 
 ## Analysis (2/3)
 
 - Mean Daily Attendance Rate
     - Aggregated course Zoom attendance into single attendance rate for each day
-- Fisher transformation applied to yield a normally distributed variable
 - Pearson correlation coefficient calculated
 - 95% confidence interval calculated for each correlation coefficient
 
