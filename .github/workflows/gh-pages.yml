@@ -15,8 +15,8 @@ jobs:
       - name: Checkout 🛎️
         uses: actions/checkout@v3
 
-      - name: Rename Report.html to Index.html
-        run: mv ./published/Report.html ./published/Index.html
+      - name: Rename Report.html to index.html
+        run: mv ./published/Report.html ./published/index.html
 
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4.3.3
