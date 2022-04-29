@@ -121,7 +121,7 @@ Let us first look at the general trends of the data.
 ### Temperature
  
 ```{r}
-gData <- read.csv("./Data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
+gData <- read.csv("./data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
 gData$date <- as.Date(gData$date_2, format = "%m/%d/%Y")
  
 accumulate_by <- function(dat, var) {
@@ -186,7 +186,7 @@ library(ggplot2)
 library(plotly)
 par(mar = c(4, 4, .1, .1))
  
-attData <- read.csv("./Data/3130 Final Project Data Sheet - Atd & Weather.csv")
+attData <- read.csv("./data/3130 Final Project Data Sheet - Atd & Weather.csv")
 attData$date <- as.Date(attData$date, format = "%m/%d/%Y")
 courseAttData <- split(attData, f=attData$course)
  
