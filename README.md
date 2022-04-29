@@ -15,3 +15,5 @@ packages <- c("fontawesome", "dplyr",
 
 install.packages(packages)
 ```
+
+This project is done being worked on. Go check out our (final report)[https://bessex.github.io/CZAP] or (https://bessex.github.io)[]!
