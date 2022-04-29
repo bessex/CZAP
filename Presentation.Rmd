@@ -365,8 +365,8 @@ cor_ <- function(.data, x, y) {
 ---
 
 - Zoom Attendance Rate vs. 7-day Avg Cases at ![](fig/u.png){ width=22 }
-    - CS 3500: $`r data %>% filter(course == 3500) %>% cor(mean_temp, atd_rate) %>% round(3)`,\ R^2 = `r data %>% filter(course == 3500) %>% rsq(mean_temp, atd_rate) %>% round(3)`$ ($p < 0.001$)_!!_
-    - CS 3200: $`r data %>% filter(course == 3200) %>% cor(mean_temp, atd_rate) %>% round(3)`,\ R^2 = `r data %>% filter(course == 3200) %>% rsq(mean_temp, atd_rate) %>% round(3)`$ ($p < 0.01$)
+    - CS 3500: $`r data %>% filter(course == 3500) %>% cor(uu_new_cases_7da, atd_rate) %>% round(3)`,\ R^2 = `r data %>% filter(course == 3500) %>% rsq(uu_new_cases_7da, atd_rate) %>% round(3)`$ ($p < 0.001$)_!!_
+    - CS 3200: $`r data %>% filter(course == 3200) %>% cor(uu_new_cases_7da, atd_rate) %>% round(3)`,\ R^2 = `r data %>% filter(course == 3200) %>% rsq(uu_new_cases_7da, atd_rate) %>% round(3)`$ ($p < 0.01$)
     - CS 4400: ($p > 0.05$) -- Not significant.
 
 ## Conclusions? ...perhaps not.

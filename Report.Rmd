@@ -20,6 +20,8 @@ library(plotly)
 library(GGally)
 ```
 
+*Note: see our final presentation slides [here](Presentation.html)*
+
 # Introduction
  
 The COVID-19 pandemic has redefined many aspects of our lives, especially how we interact with others. One such example is the expansion of online learning at all levels of education to reduce contact between students and thereby avoid disease transmission. Students today enjoy the ability to tune into lectures remotely from anywhere with the internet, as opposed to sitting in school, redefining the classroom setting. This was the status quo for a year while the spread of COVID-19 remained high, but as vaccinations were rolled out and COVID-19 rates declined many schools have returned to a hybrid model: offering classes in-person that are broadcasted online. This is observable in our lives as many of the Computer Science courses at the University of Utah teach in classrooms, but also stream lectures through the video conferencing app Zoom. Given that COVID-19 is now less of a concern and that students are attending both the Zoom and in-person, we wanted to investigate potential variables that predict attendance. This led to the questions (in relation to CS courses at the University of Utah):
