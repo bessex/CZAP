@@ -10,7 +10,8 @@ If you want to knit our report or presentation from source, be sure that you hav
 ```r
 packages <- c("fontawesome", "dplyr",
                   "ggplot2", "plotly",
-                   "GGally", "lazyeval")
+                   "GGally", "lazyeval",
+                   "rmdformats")
 
 install.packages(packages)
 ```
