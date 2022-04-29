@@ -1,157 +1,276 @@
 ---
-title: "Final Project..."
+title: "In the age of COVID, what predicts Zoom lecture attendance?"
 author: "Ben Essex, Derek Che, & Chris Marston"
-date: 04/02/2022
+date: "`r Sys.Date()`"
+output:
+  rmdformats::downcute:
+    self_contained: true
+    thumbnails: true
+    lightbox: true
+    gallery: false
+    highlight: pygments
+    # downcute_theme: "chaos" # (uncomment for dark mode)
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+library(ggplot2)
+library(dplyr)
+library(plotly)
+library(GGally)
 ```
 
-*******************************
-**HARD DEADLINE: Wed 20 @ 6PM**
-*******************************
+*Note: see our final presentation slides [here](Presentation.html)*
 
-## Introduction
-
-#TODO (add outline comments)
-
-**PROPOSED QUESTIONS** #TODO (we might want to slim these down a bit)
-
-These are the two primary questions we originally set out to answer.
-
-- "Do Covid case rates affect Zoom lecture attendance?"
-- "Does weather predict Zoom lecture attendance?"
-
-These are the original questions we had proposed broken down into a more "testable" format as per Scott's instructions.
-
-- "Does weather predict Zoom lecture attendance?
-    - "Does the temperature 2 hours before lecture affect Zoom lecture attendance?"
-    - "Does the temperature 1 hour before lecture affect Zoom lecture attendance?"
-    - "Does the temperature at the start of lecture affect Zoom lecture attendance?"
-- "Do University of Utah Covid case rates affect Zoom lecture attendance?"
-    - "Is Zoom lecture attendance affected by the total number of new Covid Cases at the University of Utah?"
-    - "Is Zoom lecture attendance affected by the 7-day average of new Covid case rates at the University of Utah?"
-- "Do Salt Lake County Covid case rates affect Zoom lecture attendance?"
-    - "Is Zoom lecture attendance affected by the 7-day average case rate per 100,000 in SLC County?"
-    - "Is Zoom lecture attendance affected by the SLC County Covid case rates per 100,000?"
-    - "Is Zoom lecture attendance affected by the 7-day average positive test rate in SLC County?"
-
-FOCUSED QUESTIONS LIST 
-
-- "Does the mean temperature before class starts affect Zoom attendence?" (use the mean temp from T+2, T+1, & T=0)
-- "Does the 7 day average case rate per 100k in Utah affect Zoom attendence?"
-- "Does the Salt Lake County percent positive test rate affect Zoom attendence?"
-
-
-## Data Collection
-
-#TODO (add outline comments)
-
-Due to the breadth of scope of the two questions being answered in this study, data was gathered from a range of sources.
-
-**Salt Lake County Covid Data**
-
-- Data was gathered from the Utah Covid Dashboard (overview) website [here](https://coronavirus-dashboard.utah.gov/overview.html) 
-
-**University of Utah Covid Data**
-
-- Data was gathered from the University of Utah Covid information page.
-- Important Notes:
-    - The U stopped posting Covid data to their public site partway through the collection period.
-        - Currently attempting to get the data from them directly...
-
-**Weather Data**
-
-Weather data was pulled from:
-
-- DarkSky for first part of data collection period.
-- OpenWeather for last part of data collection period.
-- Important Notes:
-    - We switched data collection sources part way through the collection period.
-
-**Zoom Attendance Data (headcounts)**
-
-- Gathered directly by attending Zoom and recording attendee count by Zoom.
-    - Professor excluded from count.
-    - Excluded ourselves if we would have attended in person otherwise.
-    - TAs were left in the counts - too difficult to remove them accurately.
-    - Attendees counts were taken 10 min into the lecture, at the halfway point, and 10 min before the lecture ended.
-
-
-## Methodology
-
-#TODO (add outline comments)
-
-## Analysis
-
-#TODO (add outline comments)
-
+# Introduction
+ 
+The COVID-19 pandemic has redefined many aspects of our lives, especially how we interact with others. One such example is the expansion of online learning at all levels of education to reduce contact between students and thereby avoid disease transmission. Students today enjoy the ability to tune into lectures remotely from anywhere with the internet, as opposed to sitting in school, redefining the classroom setting. This was the status quo for a year while the spread of COVID-19 remained high, but as vaccinations were rolled out and COVID-19 rates declined many schools have returned to a hybrid model: offering classes in-person that are broadcasted online. This is observable in our lives as many of the Computer Science courses at the University of Utah teach in classrooms, but also stream lectures through the video conferencing app Zoom. Given that COVID-19 is now less of a concern and that students are attending both the Zoom and in-person, we wanted to investigate potential variables that predict attendance. This led to the questions (in relation to CS courses at the University of Utah):
+ 
+1.    Do COVID-19 case rates predict Zoom lecture attendance?
+2.    Does weather predict Zoom lecture attendance?
+ 
+# Methodology
+ 
+## Operationalization
+ 
+In order to perform an investigation that answers these questions, the questions must first be reframed so as to allow us to gather and analyze relevant data in a useful way. This means getting a better understanding of our population and sample and the characteristics we need to measure. With this understanding of what it is we are studying, we can formulate a plan on how to acquire and analyze the relevant data.
+ 
+1.   Do COVID-19 case rates predict Zoom lecture attendance?
+ 
+Without any qualifiers, this question is excessively broad. Since our particular interest is students at the University of Utah, and specifically, students in the School of Computing, we can begin by levying this particular constraint. This reduces our population to only these students, which will make our data-gathering more feasible and our analysis more relevant. Further, we should constrain COVID-19 case rates to only data of relevance--since we're examining students in the University of Utah School of Computing, we should look at COVID-19 case rates at the university and in the surrounding area. For this reason, we add the additional constraint that the COVID-19 case rates used in this analysis  be those of the University of Utah and Salt Lake County. From these constraints, we can reformulate our questions:
+ 
+a.   Does the number of daily new COVID-19 cases at the University of Utah predict the proportion of a School of Computing class's enrolled students that attend a lecture via Zoom?
+b.   Does the 7-day rolling average of daily new COVID-19 cases at the University of Utah predict the proportion of a School of Computing class's enrolled students that attend a lecture via Zoom?
+c.   Does the 7-day rolling average of Salt Lake County COVID-19 cases per 100,000 predict the proportion of a School of Computing class's enrolled students that attend a lecture via Zoom?
+d.   Does the 7-day average positive COVID-19 test rate in Salt Lake County predict the proportion of a School of Computing class's enrolled students that attend a lecture via Zoom?
+ 
+By operationalizing our first research question, we have broken it down into several testable hypotheses that better lend themselves to quantitative analysis and statistical methods. We can apply this same process to our second overarching question:
+ 
+2.   Does weather predict Zoom lecture attendance?
+ 
+Again, we need to levy temporal and geospatial constraints on this question and apply the question to our target population. Since weather can be particularly broad, it is critical to be specific and explicit about which aspects of weather are of interest. In this study, we focus on temperature and weather type, as these may be most likely to be used as a heuristic by students determining whether to attend class in person or via Zoom. We estimate that, if students are sensitive to weather when making this decision, they will decide based on the weather in the two hours preceding that class. With this minimum constraints, we can reframe our question:
+ 
+e.   Does the type of weather two hours before a School of Computing class predict the percentage of students enrolled in that class that attend a lecture via Zoom?
+f.   Does the mean of the temperatures two hours before, one hour before, and at the time of a School of Computing class predict the percentage of students enrolled in that class that attend a lecture via Zoom?
+ 
+With our research questions operationalized, we can take a sample consisting of students enrolled in a select few classes in the School of Computing. This sampling and data-gathering methodology is described in greater detail in the next section.
+ 
+## Data Collection & Sampling Strategy
+ 
+To answer the questions posed by this study, we will be collecting data from a variety of sources over the course of ~10 weeks from January 18, 2022 through March 24, 2022.
+ 
+COVID-19 will be gathered from multiple sites, both because it is available and because this will give us greater insight into any correlations that might exist between Zoom attendance rates and COVID-19. Specifically, we have chosen to use COVID-19 data on the University of Utah student and staff as well as data on Salt Lake County as a whole. The specifics of this are discussed in more detail below.
+ 
+Additionally, one member of our team has engineered a [docker-ized](https://www.docker.com/) web scraper in [Node.js](https://nodejs.org/), which regularly polls the [University of Utah COVID-19 reporting page](https://coronavirus.utah.edu/) and the [OpenWeatherMap API](https://openweathermap.org/current) for current COVID-19 case data and weather data. The scraper will acquire data from these sources and record observations from these sources in Discord, which will act as a permanent record from which to retrieve results when compiling data. The nuances of this method, including interval timing, implementation details, and potential for error are discussed in later sections, including [University of Utah COVID-19 Data](#university-of-utah-covid-19-data) and [Weather Data](#weather-data).
+ 
+Source code for the web scraper is available [on Github](https://github.com/bessex/cs3130-project-helper).
+ 
+### Salt Lake County COVID-19 Data
+ 
+Since the beginning of the pandemic, Salt Lake County has been tracking case rates, positive test rates, and other COVID-19 related metrics. This data is available to the public at on [the Utah state website](https://coronavirus.utah.gov/case-counts/). The data available via the county portal is divided into numerous subsets (.csv files), many of which are not relevant to our study. The data that will be used in our analysis are as follows.
+ 
+-   Testing_7day Rolling Average Percent Positivity Test-Test.csv
+-   Overview_Seven-Day Rolling Average COVID-19 Cases by Test Report Date.csv
+ 
+The first of these data sets, Testing_7day Rolling Average Percent Positivity Test-Test.csv, provides the rolling 7-day average percent positive test rate for Salt Lake County by date, which we will use to determine if Zoom attendance at the University of Utah is correlated with this value.The second data set, Overview_Seven-Day Rolling Average COVID-19 Cases by Test Report Date.csv, provides several data points by date. Of those provided, we will be using the confirmed case count and 7-day average confirmed case count. We will use both of these data points to determine if there is a correlation between each of them and the Zoom attendance rate at the University of Utah.
+ 
+### University of Utah COVID-19 Data
+ 
+The University of Utah is tracking COVID-19 data among its students and staff and making this data available on its website. The university is tracking positive cases and the 7-day average for positive cases and is posting it on their public site. We have written a web scraper to pull the data from their website each day so that we can record it, and we will be using this data to determine if there is a relationship between positive COVID-19 cases at the University of Utah and Zoom attendance among U of U students.
+ 
+One limitation of the University of Utah COVID-19 data is that we are constrained by the University's own sampling strategy for COVID-19 data. Without a clear understanding of how this data is gathered and the uncertainty present in the methodology used to produce these observations, our confidence in our results is necessarily reduced by an unquantifiable amount. Even if we find a correlation between reported University COVID-19 case numbers and Zoom lecture attendance, this inherent validity issue means we know, at best, of a correlation between _reported_ numbers and attendance - not actual case numbers and attendance.
+ 
+### Weather Data
+ 
+Temperature data for the day of each lecture will be obtained from [OpenWeatherMap](https://openweathermap.org/city/5780993) for the Salt Lake City area (City ID: 5780993). The temperature will be recorded two hours before the class, one hour before the class, and when the class starts, as well as at 6AM and 6PM. The weather conditions, as coded by OpenWeatherMap (cloudy, sunny, raining, etc.), will also be recorded two hours before the class starts.
+ 
+In order to gather this data, we will use the web scraper we built to poll OpenWeatherMap. The scraper will collect Salt Lake City temperature, to the hundredth of a degree centigrade, two hours before, one hour before, and precisely when class starts ($\pm 5$ minutes). As with any weather data, there is the possibility of measurement error introduced by weather observation equipment. However, the uncertainty introduced by possible measurement error is negligible relative to that introduced by the obstacles in our other datasets. Additionally, since temperatures are being manually copied and pasted between Discord and our data spreadsheet, there is a small, unquantifiable possibility of human error in transferring the data that may impact data reliability.
+ 
+### Zoom Attendance Data
+ 
+Zoom attendance data will be collected directly from Zoom for hybrid Computer Science courses at the University of Utah. The courses sampled from will be,
+ 
+- CS 3500
+- CS 4400
+- CS 3200
+- CS 5140
+- CS 3130
+ 
+Data will be collected every lecture spanning roughly 10 weeks, from January 18, 2022 to March 24, 2022. Zoom attendance data will be collected three times per lecture: 10 minutes after the class starts, halfway through class, and 10 minutes before the end of class. Attendance then will then be calculated by taking the total number of participants in the Zoom lecture and subtracting one for the teacher and one for the researcher (us) collecting the data if they would not have otherwise attended the Zoom lecture.
+ 
+Enrollment data for each course will be recorded near the end of the collection period, on March 25, 2022. This information will be acquired from University of Utah's Campus Information System (CIS) to determine the number of students enrolled in each course at that point in time.
+ 
+## Data Analysis Strategy
+ 
+ The data analysis will begin with visualization-focused exploratory data analysis (EDA) on our collection. We will examine each variable for basic trends and any relevant summary statistics. Afterwards, we will apply linear regression methods to pairs of our variables in order to attempt to answer the research questions. After performing a basic regression, we will control for `course` and examine whether correlations exist within specific courses and compare results between courses, if relevant.
+ 
+# Analysis
+ 
+With the data collection complete, we can begin analysis. We should first point out, however, obstacles that arose during the collection period that may have detrimental impact on our ability to conduct a robust analysis.
+ 
+Part way through our study, Salt Lake County and the state of Utah stopped reporting the percent positivity rate. This occurred on March 24, 2022. As such, our data for this metric only covers the period from January 18 to March 24.
+ 
+As of March 3, 2022 the University of Utah stopped posting their COVID-19 data online. In addition, when we contacted the university and the associated University of Utah Medical Center, they were unable to provide us with the data for the period after March 3rd. As a result, we will only have data points for U of U COVID-19 rates from January 18 through March 3, 2022. Furthermore, the unexpected change in the University of Utah COVID-19 reporting page precipitated a brief scraper outage, resulting in a loss of weather data for a single day, for which we have used NA in place of the observations.
+ 
+<!-- Begin Derek’s section -->
+ 
+## Exploratory Data Analysis
+ 
+Let us first look at the general trends of the data.
+ 
+### Temperature
+ 
 ```{r}
-# import libraries
-# data <- read csvs
-
-# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-# |  Date |  T+10 | T+40 | T+70 | mean(...) | Temp T-2 | Temp T-1 | Temp T-0 | Weather | Class | UU New Cases | UU 7-Day Avg New Cases | SLCo Case Rate | SLCo 7-Day Avg Case Rate| SLCo 7-Day Avg Positive Test Rate | 
-# +-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-
-# regression analyses:
-#   - stimulus: nominal_weather, response: mean_attendance
-#     - logistic regression(?)
-#   - stimulus: temperature ->
-#     - linear regression
-#     - T-2 -> mean_attendance
-#     - T-1 -> mean_attendance
-#     - T-0 -> mean_attendance
-#   - stimulus: COVID... ->
-#     - linear regression
-#     - uu_new_cases -> mean_attendance
-#     - uu_new_cases_7day_avg -> mean_attendance
-#     - slco_case_rate -> mean_attendance
-#     - slco_case_rate_7day_avg -> mean_attendance
-#     - slco_pos_test_rate_7day_avg -> mean_attendance
-#   - more?
-
-# correlation coefficients
-#   - confidence interval
-#   - point estimate
+gData <- read.csv("./data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
+gData$date <- as.Date(gData$date_2, format = "%m/%d/%Y")
+ 
+accumulate_by <- function(dat, var) {
+  var <- lazyeval::f_eval(var, dat)
+  lvls <- plotly:::getLevels(var)
+  dats <- lapply(seq_along(lvls), function(x) {
+    cbind(dat[var %in% lvls[seq(1, x)], ], frame = lvls[[x]])
+  })
+  dplyr::bind_rows(dats)
+}
+ 
+gData <- gData %>% accumulate_by(~date)
+ 
+pAvgTemp = ggplot(gData, aes(x=date, y=mean_daily_temp, frame=frame)) + geom_line() + labs(title="Mean Daily Temperature Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Temperature (F)") + geom_smooth(method = "lm")
+ 
+ggplotly(pAvgTemp) %>%
+  animation_opts(
+    frame = 100,
+    transition = 0,
+    redraw = FALSE
+  ) %>%
+  animation_slider(
+    currentvalue = list(
+      prefix = "Date"
+    )
+  )
 ```
-
+ 
+From the graph above, we can see that the average temperature increased as the semester went on. This makes sense as the semester began in the winter and progressed into spring. Interestingly, we can see two particularly cold days on February 3rd (21 degrees) and February 23 (20 degrees) and one abnormally warm day on March 3 (56.5 degrees).
+ 
+Thus, we can conclude that temperatures were generally increasing as the semester progressed.
+ 
+### COVID-19 Case Rates
+ 
+First, we will look at the average number of daily case counts.
+ 
 ```{r}
+pAvgTemp <- ggplot(gData, aes(x=date, y=daily_confirmed_case_count)) + geom_line() + labs(title="Mean Daily COVID-19 Case Counts Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Case Counts") + geom_smooth(method = "loess")
+ 
+ggplotly(pAvgTemp)
+```
+ 
+Here, we can see that the number of daily COVID-19 cases dropped exponentially when comparing the beginning and end of the semester. This could be explained by increasing vaccination rates, people being more cautious, or
+people not caring enough to get tested. Regardless of the reason, we can clearly see a downwards trend in COVID-19 cases.
+ 
+We can then look at the confirmed case count seven day average.
+ 
+```{r}
+pAvgTemp <- ggplot(gData, aes(x=date, y=positive_test_rate_7d_avg)) + geom_line() + labs(title="Positive Test Rate 7 Day Average Between Jan 18, 2022 to Mar 24, 2022", x = "Date", y = "Positive Test Rate") + geom_smooth(method = "loess")
+ 
+ggplotly(pAvgTemp)
+```
+ 
+The graph above shows a linear trend of decreasing positive test rates in Salt Lake County as the semester progresses.
+ 
+Thus, these two graphs support the hypothesis that COVID-19 rates decreased over time.
+ 
+### Zoom Attendance Data
+ 
+```{r}
+library(ggplot2)
+library(plotly)
+par(mar = c(4, 4, .1, .1))
+ 
+attData <- read.csv("./data/3130 Final Project Data Sheet - Atd & Weather.csv")
+attData$date <- as.Date(attData$date, format = "%m/%d/%Y")
+courseAttData <- split(attData, f=attData$course)
+ 
+p3130 <- ggplot(courseAttData$`3130`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+ 
+p3200 <- ggplot(courseAttData$`3200`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+ 
+p3500 <- ggplot(courseAttData$`3500`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+ 
+p4400 <- ggplot(courseAttData$`4400`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+ 
+p5140 <- ggplot(courseAttData$`5140`, aes(x=date, y=mean_atd)) + geom_line() + geom_smooth(method = "lm")
+ 
+fig <- subplot(p3130, p3200, p3500, p4400, p5140, nrows=3, margin=0.07, titleY = TRUE) %>%
+  layout(title = "Mean Zoom Attendance Between Jan 18, 2022 to Mar 24, 2022 for Courses")
+ann <- list(list(x = 0.15 , y = 1.01, text = "CS 3130", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.85 , y = 1.01, text = "CS 3200", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.15 , y = 0.61, text = "CS 3500", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.85 , y = 0.61, text = "CS 4400", showarrow = F, xref='paper', yref='paper'),
+           list(x = 0.15 , y = 0.21, text = "CS 5140", showarrow = F, xref='paper', yref='paper')
+           )
+fig <- fig %>% layout(annotations = ann)
+ 
+fig
+```
+ 
+From the plots above, we can see that Zoom attendance varies wildly between different courses with many peaks and troughs. However, the one exception is CS 3200 where we can see that the number of Zoom attendees generally decreased as the semester went on. Otherwise, the other courses displayed a general trend of a relatively constant number of Zoom people throughout the semester. One common attribute shared among all the graphs was that the number of attendance dropped near March 1st.
+ 
+Thus, we can conclude that the Zoom attendance rates remained mostly relatively constant throughout the semester.
+ 
+<!-- End Derek’s section, begin Chris’s section -->
+
+## Regression Analysis
+
+### Aggregate
+ 
+Now that the preliminary evaluation of the data is complete, we can begin calculating correlation coefficients and confidence intervals to accompany them. Because we collected data on a large number of variables we have chosen to conduct a preliminary analysis using a subset of the variables and an aggregated value for our daily attendance rate. The following data was used in this analysis.
+ 
+- Zoom attendance data collected at the University of Utah
+- Temperature at 6AM and 6PM collected from OpenWeatherMaps
+- Daily confirmed case count from the Salt Lake County dataset
+- 7-day average case count from the Salt Lake County dataset
+- 7-day average positive test rate from the Salt Lake County dataset
+ 
+The correlations being evaluated in this section of the analysis are,
+ 
+- Mean Attendance Rate vs Mean Daily Temperature
+- Mean Attendance Rate vs Daily Confirmed New Case Count in Salt Lake County
+- Mean Attendance Rate vs 7-Day Average Confirmed New Case Count in Salt Lake County
+- Mean Attendance Rate vs 7-Day Average Positive Test Rate in Salt Lake County
+ 
+To determine an attendance rate for each day Zoom attendance was recorded, an attendance rate was calculated for each course by averaging the three Zoom lecture headcounts for each course and then dividing that value by that course’s current enrollment. The enrollment rates for each day (each day had several rates, one for each of the courses that met that day) were then averaged to produce a single attendance rate value for each day on record. This is the Mean Atd Rate.
+ 
+Due to the complexity of calculating correlation coefficients for each of the courses based on temperature data collected for a specific time before each class began, the 6AM and 6PM temperatures were averaged to get an average daily temperature for the time period during which the classes were in session.
+ 
+All COVID-19 data was pulled directly from the .csv files downloaded from the Utah State Government site and used without modification.
+ 
+```{r, echo=FALSE}
 # READING IN DATA
-
-atd_and_weather_data = read.csv("data/3130 Final Project Data Sheet - Atd & Weather.csv")
-atd_daily_temp_and_covid = read.csv("data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
-
+ 
+atd_and_weather_data <- read.csv("data/3130 Final Project Data Sheet - Atd & Weather.csv")
+atd_daily_temp_and_covid <- read.csv("data/3130 Final Project Data Sheet - Mean Atd Rate, Mean Daily Temp, & COVID-19.csv")
+ 
 ```
-
-```{R}
-# GENERATING VISUALIZATIONS
-
-
-
-
-```
-
-```{R}
+ 
+```{r, echo=FALSE}
 # FUNCTIONS
-
+ 
 # Confidence Interval Calculation: https://www.statology.org/confidence-interval-correlation-coefficient/
 # z-score Calculation: https://www.statology.org/z-score-r/
-
+ 
 Fisher_Transformation = function(correlation_coefficent) {
     return(
         log( ( (1 + correlation_coefficent) / (1 - correlation_coefficent) ) ) / 2
     )
 }
-
-# Use our corellation coefficent for the data_value here
+ 
+# Use our correlation coefficient for the data_value here
 Z_Score = function(data_value, sample_mean, sample_sd) {
     return(
         ( data_value - sample_mean ) / sample_sd
     )
 }
-
+ 
 Log_Bounds = function(upper, fisher_transformed, z_score, sample_size) {
     if (upper == TRUE) # Calculate the upper bound
     {
@@ -166,129 +285,406 @@ Log_Bounds = function(upper, fisher_transformed, z_score, sample_size) {
         )
     }
 }
-
+ 
 CI_Upper = function(log_upper_bound) {
     return(
         (exp(2 * log_upper_bound) - 1) / (exp(2 * log_upper_bound) + 1 )
     )
 }
-
+ 
 CI_Lower = function(log_lower_bound) {
     return(
         (exp(2 * log_lower_bound) - 1) / (exp(2 * log_lower_bound) + 1 )
     )
 }
-
-
+ 
 ```
-
-```{r}
+ 
+```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- mean_daily_temp
-
-# Find the Correlation Coefficent
+ 
+# Find the Correlation Coefficient
 mean_daily_temp_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$mean_daily_temp)
-
+ 
 # Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
 fisher_transformed = Fisher_Transformation( mean_daily_temp_correlation )
-
+ 
 # Calculate z-score
 z_score = 1.96 # 95% confidence - assumes normally distributed data
-
+ 
 # Find upper and lower bounds
 log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 # Find the confidence interval
 CI_upper_atd_vs_temp = CI_Upper(log_upper_bound)
-
+ 
 CI_lower_atd_vs_temp = CI_Lower(log_lower_bound)
-
+ 
 ```
-
-```{r}
-# CORRELATION COEFFICIENT & CONFIDENCE INFERVALS FOR mean_daily_atd_rate --- daily_confirmed_case_count
-
-# Find the Correlation Coefficent
+ 
+```{r, echo=FALSE}
+# CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- daily_confirmed_case_count
+ 
+# Find the Correlation Coefficient
 mean_daily_case_count_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                         atd_daily_temp_and_covid$daily_confirmed_case_count)
-
+ 
 # Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
 fisher_transformed = Fisher_Transformation( mean_daily_case_count_correlation )
-
+ 
 # Calculate z-score
 z_score = 1.96 # 95% confidence
-
+ 
 # Find upper and lower bounds
 log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 # Find the confidence interval
 CI_upper_atd_vs_case_count = CI_Upper(log_upper_bound)
-
+ 
 CI_lower_atd_vs_case_count = CI_Lower(log_lower_bound)
-
+ 
 ```
-
-```{r}
+ 
+```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- confirmed_case_count_7d_avg (confirmed_7dcc)
-
-# Find the Correlation Coefficent
+ 
+# Find the Correlation Coefficient
 mean_daily_confirmed_7dcc_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$confirmed_case_count_7d_avg)
-
+ 
 # Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
 fisher_transformed = Fisher_Transformation( mean_daily_confirmed_7dcc_correlation )
-
+ 
 # Calculate z-score
 z_score = 1.96 # 95% confidence
-
+ 
 # Find upper and lower bounds
 log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 # Find the confidence interval
 CI_upper_atd_vs_confirmed_7dcc = CI_Upper(log_upper_bound)
-
+ 
 CI_lower_atd_vs_confirmed_7dcc = CI_Lower(log_lower_bound)
-
+ 
 ```
-
-```{r}
+ 
+```{r, echo=FALSE}
 # CORRELATION COEFFICIENT & CONFIDENCE INTERVALS FOR mean_daily_atd_rate --- positive_test_rate_7d_avg (positive_7dtr)
-
-# Find the Correlation Coefficent
+ 
+# Find the Correlation Coefficient
 mean_daily_positive_7dtr_correlation = cor(atd_daily_temp_and_covid$mean_daily_atd_rate,
                                   atd_daily_temp_and_covid$positive_test_rate_7d_avg)
-
+ 
 # Perform Fisher Transformation (this make the data "normally distributed" so that we can properly generate a confidence interval, which requires normally distributed data)
 fisher_transformed = Fisher_Transformation( mean_daily_positive_7dtr_correlation )
-
+ 
 # Calculate z-score
 z_score = 1.96 # 95% confidence
-
+ 
 # Find upper and lower bounds
 log_upper_bound = Log_Bounds(TRUE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 log_lower_bound = Log_Bounds(FALSE, fisher_transformed, z_score, nrow( atd_daily_temp_and_covid ) )
-
+ 
 # Find the confidence interval
 CI_upper_atd_vs_positive_7dtr = CI_Upper(log_upper_bound)
-
+ 
 CI_lower_atd_vs_positive_7dtr = CI_Lower(log_lower_bound)
+ 
+```
+ 
+A Pearson correlation coefficient was calculated for each of the dataset pairs and a Fisher Transformation was performed on the result to yield a normally distributed variable.
+ 
+A 95% confidence interval was then calculated for each of the correlation coefficients and the upper and lower bounds of the intervals was determined.
+ 
+The following are the results of this analysis:
+ 
+- Mean Attendance Rate vs Mean Daily Temperature
+    - Correlation Coefficient: `r round(mean_daily_temp_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_temp, 4)`, `r round(CI_upper_atd_vs_temp, 4)`
+- Mean Attendance Rate vs Daily Confirmed New Case Count in Salt Lake County
+    - Correlation Coefficient: `r round(mean_daily_case_count_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_case_count, 4)`, `r round(CI_upper_atd_vs_case_count, 4)`
+- Mean Attendance Rate vs 7-Day Average Confirmed New Case Count in Salt Lake County
+    - Correlation Coefficient: `r round(mean_daily_confirmed_7dcc_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_confirmed_7dcc, 4)`, `r round(CI_upper_atd_vs_confirmed_7dcc, 4)`
+- Mean Attendance Rate vs 7-Day Average Positive Test Rate in Salt Lake County
+    - Correlation Coefficient: `r round(mean_daily_positive_7dtr_correlation, 4)`
+    - Confidence Interval: `r round(CI_lower_atd_vs_positive_7dtr, 4)`, `r round(CI_upper_atd_vs_positive_7dtr, 4)`
+ 
+<!-- End Chris’s section, begin Ben’s section -->
 
+### Controlled for Course
+ 
+In performing a more in-depth analysis with Pearson correlations, we must first define a function to calculate the Pearson coefficient of determination, or $R^2$. This number, which will fall between 0 and 1, shows what percentage of the variation in the response (dependent) variable is explained by the explanatory (independent) variable. We can also redefine `?cor` such that it becomes more readily usable with `dplyr`.
+
+Since we are using `dplyr` for much of this analysis, we define the functions using `lazyeval` to support non-standard evaluation.
+ 
+```{r}
+# define dyplyr-able function to calculate R^2
+rsq <- function(.data, x, y) {
+    rsq_(.data, lazyeval::lazy(x), lazyeval::lazy(y))
+}
+ 
+# define corollary function_ since we're using non-standard evaluation (NSE)
+rsq_ <- function(.data, x, y) {
+    require(lazyeval)
+    summary(lm(lazy_eval(x, .data)~lazy_eval(y, .data)))$r.squared
+}
+ 
+# bonus:
+# define dyplyr-able function to calculate Pearson correlation coefficient
+cor <- function(.data, x, y) {
+    cor_(.data, lazyeval::lazy(x), lazyeval::lazy(y))
+}
+ 
+# define corollary function_ since we're using non-standard evaluation (NSE)
+cor_ <- function(.data, x, y) {
+    stats::cor(x = lazyeval::lazy_eval(x, .data),
+               y = lazyeval::lazy_eval(y, .data),
+               use = "complete.obs")
+}
+```
+ 
+With these functions defined, we ingest the raw data and appropriately transform, or "wrangle" it, such that we are able to visualize and analyze it.
+ 
+```{r}
+# compute mean attendance and propagate NA
+# compute attendance rate based on number enrolled
+# convert course into a factor
+# convert weather into a factor
+# make date R-readable
+# compute mean of temps 2 hours before class
+data <- read.csv("data/atd_weather_full.csv") %>%
+    rowwise() %>%
+    mutate(mean_atd = mean(c(atd_start, atd_mid, atd_end))) %>%
+    mutate(atd_rate = mean_atd / enrolled) %>%
+    mutate(course = factor(course)) %>%
+    mutate(weather = factor(weather)) %>%
+    mutate(date = as.Date(date, "%m/%d/%Y")) %>%
+    mutate(mean_temp = mean(temp_tm2, temp_tm1, temp_tm0, na.rm = TRUE))
+```
+ 
+Now that the data has been ingested, we pare down our explanatory variables to only those at the interval level of measurement. This includes: `mean_temp`, which represents the mean of temperature 2 hours before, 1 hour before, and at the time class begins; `uu_new_cases`, which represents the number of daily new COVID cases were recorded at the University of Utah; and `uu_new_cases_7da`, which represents a rolling, 7-day average of daily new COVID cases recorded at the University of Utah. We also include `atd_rate`, our response variable, which we compute by taking the mean of Zoom lecture attendees at each of our three data points, then dividing this number by the number of students enrolled in the course at the end of the data collection period.
+ 
+Our goal here is to begin by focusing on only a handful of variables, which we hope will allow us to quickly see trends and correlations across many pairs of variables.
+ 
+```{r}
+# filtering down to a choice few variables
+data_filtered <- data %>%
+    select(date, course, atd_rate, mean_temp,
+           uu_new_cases, uu_new_cases_7da)
+```
+ 
+With our data fully transformed, we can begin to plot correlations. The quickest way to bootstrap this process is by making a scatter plot with `ggplot2` and visually inspecting the initial results.
+ 
+```{r}
+# begin by looking at mean temp
+data_filtered %>%
+    ggplot(aes(mean_temp, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+```
+ 
+When we begin by looking at the correlation between `mean_temp` and `atd_rate`, shown above, we immediately see class-wise trends emerge. Even with bands of standard error, we see a fairly good fit for 4400, which trends slightly upward, and for 3500, which trends sideways. 3200, despite having wider error bounds, seems to mostly trend downward. Since we see different trends with different classes, it suggests class could be confounding variable we hadn't earlier considered. This reality highlights the possibility that there may be unmeasured characteristics of the class itself that may interact with `mean_temp` and a student's likelihood to attend class via Zoom. For example, it's possible that for difficult or very important classes, students are relatively "inelastic", or insensitive, to changes in weather, preferring to always attend in person. While we should nod to this possibility, we lack the data and instrumentation to fully capture this variable and decompose it into its atomic parts, which is a limitation of this study.
+ 
+We can continue with `ggplot2`, now looking at `uu_new_cases` and `uu_new_cases_7da` as explanatory variables.
+ 
+```{r,warning=FALSE}
+# Explanatory: `uu_new_cases`
+data_filtered %>%
+    ggplot(aes(uu_new_cases, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+ 
+# Explanatory: `uu_new_cases_7da`
+data_filtered %>%
+    ggplot(aes(uu_new_cases_7da, atd_rate, color = course)) +
+    geom_point() +
+    geom_smooth(method = "lm") +
+    scale_color_manual(values = c("3130" = "purple",
+                                  "3200" = "red",
+                                  "5140" = "green",
+                                  "3500" = "orange",
+                                  "4400" = "blue"))
+```
+ 
+For `uu_new_cases`, the first thing we notice is that there are very few data points at the very high end of the x-axis. This is because, toward the beginning of our data collection period, there were 1 or 2 days of collection that occurred right at the end of a COVID surge. For 3200 and 4400, we see that the trend-lines do not even extend beyond around 50 cases. Since data collection for these classes began just a day or two after the surge had already dropped back down, no observations exist here at the higher end of our explanatory variable for these classes. Furthermore, with so few data at this high end, the error margins are too large for us to draw any preliminary conclusions from these trends. We might look at 5140, for which Zoom attendance rate appears to increase perhaps linearly or logarithmically with daily new cases. But then we could also look at 3500, for example, for which Zoom attendance rate almost certainly decreases with the daily case count.
+ 
+If we look at the 7-day average, `uu_new_cases_7da`, we get slightly more interesting results. Again, margins of error here make our results from 5140 and 3130 not immediately useful to us. However, we can see trends emerging again from 3200, 4400, and 3500, for which Zoom attendance rate appears to increase, move sideways, and decrease with average cases, respectively.
+ 
+With some initial trends in mind, we can begin computing correlation pairs for each class. This is a way to get slightly better depth of information, though we're still in the exploratory stage of looking at the gathered data.
+ 
+```{r}
+# This will be the general format for performing some
+# exploratory analysis on variable pairs.
+# We do this for each class.
+p3500 <- data_filtered %>%
+    filter(course == 3500) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "3500 Pairs")
+```
+ 
+```{r, include=FALSE}
+p3130 <- data_filtered %>%
+    filter(course == 3130) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "3130 Pairs")
+ 
+p3200 <- data_filtered %>%
+    filter(course == 3200) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "3200 Pairs")
+ 
+p4400 <- data_filtered %>%
+    filter(course == 4400) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "4400 Pairs")
+   
+p5140 <- data_filtered %>%
+    filter(course == 5140) %>%
+    select(!course) %>%
+    ggpairs() +
+    labs(title = "5140 Pairs")
+ 
+```
+ 
+Now that we have prepared our plots, we can plot them one-by-one.
+ 
+```{r, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p3500)
+```
+ 
+With 3500, we see a few interesting correlations. We see `uu_new_cases_7da` has a significant negative correlation with `atd_rate` ($p < 0.001$), `uu_new_cases` with `atd_rate` ($p < 0.01$). Mean temperature seems to have no significance here.
+ 
+```{r, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p3130)
+```
+ 
+With 3130, we see no interesting correlations of any significance. We see a correlation between `uu_new_cases_7da` and `uu_new_cases`, which we would expect for trivial reasons. We also see a correlation between case rates and date, which supports an assumption we alluded to earlier--that case rates have mostly decreased as the data collection period went on.
+ 
+```{r, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p3200)
+```
+ 
+With 3200, we see some correlations of significance. `uu_new_cases_7da` and `uu_new_cases` appear to have strong positive correlations with `atd_rate` ($p < 0.01$), and `mean_temp` a slightly weaker, negative correlation with `atd_rate` ($p < 0.01$). We also see a correlation between `atd_rate` and `date` ($p < 0.001$), which, since case rates also correlate with date, makes it difficult to infer causality in the earlier correlations. What looks like COVID case rates predicting attendance might in fact be dropping Zoom attendance as the semester goes on, unrelated to COVID case numbers.
+ 
+```{r, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p4400)
+```
+ 
+For 4400, we see a fairly strong positive correlation between `mean_temp` and `atd_rate` ($p < 0.01$) and between `date` and `atd_rate` ($p < 0.01$).
+ 
+```{r, warning=FALSE, out.height="550px", out.width="750px", fig.height=10, fig.width=10, echo=FALSE}
+ggplotly(p5140)
+```
+ 
+Finally, for 5140, we see essentially no correlations of interest and significance.
+
+```{r, include=FALSE}
+cs3200_mean_temp_cor <- data %>% filter(course == 3200) %>% cor(mean_temp, atd_rate) %>% round(3)
+cs3200_mean_temp_rsq <- data %>% filter(course == 3200) %>% rsq(mean_temp, atd_rate) %>% round(3)
+cs4400_mean_temp_cor <- data %>% filter(course == 4400) %>% cor(mean_temp, atd_rate) %>% round(3)
+cs4400_mean_temp_rsq <- data %>% filter(course == 4400) %>% rsq(mean_temp, atd_rate) %>% round(3)
+
+cs3500_cases_cor <- data %>% filter(course == 3500) %>% cor(uu_new_cases_7da, atd_rate) %>% round(3)
+cs3500_cases_rsq <- data %>% filter(course == 3500) %>% rsq(uu_new_cases_7da, atd_rate) %>% round(3)
+cs3200_cases_cor <- data %>% filter(course == 3200) %>% cor(uu_new_cases_7da, atd_rate) %>% round(3)
+cs3200_cases_rsq <- data %>% filter(course == 3200) %>% rsq(uu_new_cases_7da, atd_rate) %>% round(3)
 ```
 
+Takeaways:
 
+- Zoom Attendance Rate vs. Mean Temp
+    - CS 3500: ($p > 0.05$) -- Not significant.
+    - CS 3200: $`r cs3200_mean_temp_cor`,\ R^2 = `r cs3200_mean_temp_rsq`$ ($p < 0.01$)
+    - CS 4400: $`r cs4400_mean_temp_cor`,\ R^2 = `r cs4400_mean_temp_rsq`$ ($p < 0.01$)
 
+- Zoom Attendance Rate vs. 7-day Avg Cases at University of Utah
+    - CS 3500: $`r cs3500_cases_cor`,\ R^2 = `r cs3500_cases_rsq`$ ($p < 0.001$)_!!_
+    - CS 3200: $`r cs3200_cases_cor`,\ R^2 = `r cs3200_cases_rsq`$ ($p < 0.01$)
+    - CS 4400: ($p > 0.05$) -- Not significant.
 
-## Limitations
-
-#TODO (add outline comments)
-
-## Conclusions
-
-#TODO (add outline comments)
+<!-- End Ben's Section -->
+ 
+# Conclusions
+ 
+The above analysis has yielded some interesting results. The preliminary analysis of the combined attendance data (attendance data for all of the courses under studied combined to produce a single attendance rate metric for each day on record) showed that there was essentially no correlation between the Zoom lecture attendance rate and  mean daily temperature in Salt Lake City, daily confirmed new case count in Salt Lake County, 7-day average confirmed new case count in Salt Lake County, or 7-day average positive test rate in Salt Lake County.
+ 
+However, when correlations were evaluated in a non-aggregate manner, different trends appeared. In CS 3500, where a strong negative correlation ($`r cs3500_cases_cor`,\ R^2 = `r cs3500_cases_rsq`$) between the Zoom lecture attendance rate and the 7-day average new cases at the University of Utah (U of U) was found. In CS 3200 a strong positive correlation ($`r cs3200_cases_cor`,\ R^2 = `r cs3200_cases_rsq`$) between the Zoom lecture attendance rate and the 7-day average new cases at the U of U was found. And finally, in CS 4400 a strong correlation ($`r cs4400_mean_temp_cor`,\ R^2 = `r cs4400_mean_temp_rsq`$) between Zoom lecture attendance and the mean temperature in Salt Lake City was found.
+ 
+It is perhaps not surprising that consolidating data into single variables yields lesser or non-existent correlations because the data will largely average out. Especially when the correlations for each class are evaluated on an individual basis. Because the individual values are inconsistent with each other (some positive correlations and some negative correlations), it becomes clear that combining them will likely yield no correlation at all.
+ 
+This observation prompts the question of why the results of the individual analysis are so inconsistent, which leads to an evaluation of the limitations of each of these methods. The limitations of this study are, unfortunately, numerous and have been discussed in the following section, but a few points are worth noting with regards to this question. The most likely explanation for the variation in our correlation values for the per class analysis is the presence of confounding variables that were not adequately accounted for. The most notable of these are the different factors influencing Zoom lecture attendance that are unrelated to COVID-19 or the weather, but may be related to the courses themselves, such as professors actively discouraging Zoom attendance by assigning work that could only be done in person during lecture and some classes having lower quality Zoom recordings than others (low video or audio quality, no screen shared slides, etc.).
+ 
+These variables, along with the others discussed below, are likely the cause of the high variability in the results of our analysis and more importantly make it difficult to have a high level of confidence in the correlation values calculated from the data gathered in this study. Because of this, we have chosen not to make any final conclusions regarding the results of this study. That is, we cannot say with any confidence whether or not there is a correlation between the studied variables and the Zoom lecture attendance of School of Computing students at the University of Utah. Instead, this study should be viewed as a preliminary study into the students in the University of Utah's School of Computing regarding their Zoom lecture attendance behavior and should be followed up with more structured and controlled research should stronger conclusions be desired.
+ 
+## Limitations 
+ 
+While some correlations were found in the data that was gathered, there are some limitations that must be mentioned that have a potential to impact the validity and/or reliability of our conclusions. They are as follows.
+ 
+### Sampling Methodology
+The Zoom attendance data for this study was collected using a convenience sample. Specifically, we chose to collect attendance data on the courses that we were currently enrolled in so as to make data collection easy. The implications of this are that our sample probably does a poor job of representing our target population's Zoom attendance for hybrid Computer Science courses at the University of Utah. Therefore, it is difficult for us to confidently assert that our findings are fully representative of the population. A better approach would have been to randomly select classes from all of the possible hybrid Computer Science courses at the university (a simple random sample), which would have produced a sample whose characteristics are more similar to that of the population under study.
+ 
+### Zoom Attendance Counting Methodology
+In our counting method for Zoom attendance, we took the total number of people on Zoom and subtracted one for the teacher and one for the researcher (if they would not have otherwize logged into the Zoom meeting). This approach neglected the fact that this count could potentially include non-students. For example, several of the classes under study had teaching assistants (TAs) that attended via Zoom and that we weren't able to easily remove from the count. This may arbitrarily inflate attendance numbers when they attend and introduce increased variability in the attendance counts if the TAs attended inconsistently.  We do not expect this to be a major issue as the proportion of TAs to students is low. One way to avoid this would have been to be more rigorous in our data collection by going through people's names in Zoom to verify their student identity before including them in the count, thereby eliminating all TAs from the count.
+ 
+### Small Sample Size
+Due to the short length of the university semester (15 weeks), we were unable to collect more than ~10 weeks worth of attendance data that includes 2-3 class periods (data points) per week for each class. Compounding the issue are days where data could not be collected like CS 3130 labs, midterms, spring break, and holidays. Ultimately, these reduced our total sample size making it more difficult for us to reliably discover correlations. To improve upon this issue, we could have increased the duration of our study to collect more data points; however, this would have required that we extend our study to other semesters, which would not have been feasible for the goals of this course.
+ 
+### Timing of COVID-19 Correlations
+As part of our study, we made the assumption that COVID-19 cases impact attendance the day of the lecture. The original reasoning was that COVID-19 cases would reflect how many people were sick on a given day or that higher case rates would be concerning to students, both of which could cause them to attend lectures on Zoom. This is not a guarantee given the asymptomatic period of COVID-19 where someone may test positive but feel fine. In this scenario, they could still attend many classes in person before they find out, making our study weaker. Given this, a future experiment might benefit from examining COVID-19 case rates delayed from the date of the lecture, e.g., COVID-19 cases a few days before lecture.
+ 
+### Inaccurate COVID-19 Data
+Our study assumes accurate COVID-19 data despite it not being guaranteed. The COVID-19 data we used for this study (from Salt Lake County, the state of Utah, and the University of Utah) may not accurately reflect COVID-19 case counts or positive test rates. This is likely due to multiple factors like limited tests and testing facilities and an inability to test the entire population regularly. Therefore, it is likely that the COVID-19 data we collected actually undercounts the actual case count by a some margin. This error, depending on how large it is, could be negligible given that we are simply trying to measure the general trend of COVID-19 cases in relation to Zoom attendance. However, given that there exists this uncertainty, we acknowledge that it introduces some level of uncertainty into our conclusions.
+ 
+### Weather Data
+The temperature data that we collected was to-the-minute while the weather type data points (sunny, cloudy, etc.) were collected two hours before the associated class began. Because of this, any correlation that might be present between the type of weather and Zoom lecture attendance will have to be present in the data at the time minus two hours mark to be visible in our data set. If the correlation depends on the weather type at a different point in time before a lecture begins or on the trend of the weather type before lecture, our analysis will not show this. This simply means that we cannot be fully confident in any lack of correlation between the type of weather and Zoom lecture attendance.
+ 
+### Possible Confounding Variables
+We have identified several confounding variables in our study that reduce our ability to make strong conclusions about any correlations found by our analysis. They are as follows.
+ 
+#### **Date**
+Date could be independently associated with both COVID-19 case rates and Zoom lecture attendance. For example, it is possible that students increasingly prefer to attend lectures via Zoom as the semester progresses. If at the same time COVID-19 cases decline (as they did over the period of our study) for other reasons, our analysis would show a spurious correlation between COVID-19 case rates and Zoom lecture attendance. One observable phenomenon within our experiment that might contribute to something like this happening was in CS 3200, wherein the professor actively discouraged students from attending Zoom lectures unless they were explicitly ill from COVID-19 by assigning assignments that were only available in class. 
+ 
+#### **Time of Class**
+The time that a class starts could impact attendance over Zoom vs in-person. Earlier classes might be the ones that students tend to attend via Zoom because it allows them to sleep in. Later classes might also see a similar effect where students head home early and attend their later classes via Zoom in order to avoid traffic. Of course, it is also possible that the time a class begins has no effect on Zoom attendance. But because we don't know, we have chosen to list this as a potential confounding variable that may impact the strength of our conclusions.
+ 
+#### **Commute Length**
+##### *Commute length and time of day*
+Not all students are the same distance from campus. This variable might interact with time of class. For example, if a student has a 2 hour commute and is not a “morning person,” they might be more likely to prefer to attend a lecture over Zoom if it's an early-morning class. Contrast this case to a student who lives on campus, and we might see the latter student more likely to attend in class in person. This is perhaps the biggest confounding variable in our study given that Zoom and other video-conference apps provide convenience and ability to attend lectures while not directly in a classroom.
+ 
+##### *Commute length and campus activities*
+Commute length might interact with another variable--whether a student has other reasons to be on campus. If a student has only one 80-minute class on a given day, but a 2 hour commute each way, that student might be less likely to attend class in person for 80 minutes and spend 4 hours commuting. Again, a student that lives on campus does not have this issue, and may be comparatively more likely to attend class in person. 
+ 
+##### *Commute length and weather*
+Finally, commute length might impact when a student looks at the weather and decides when to go to class. In this case, it's possible a student who walks to class 15 minutes before it starts doesn't decide until the last minute, whereas a student who drives 2 hours to get to campus checks much earlier, before they start their drive.
+ 
+Of course, in all of the cases, individual preference supersedes each variable. It's quite possible some students don't care about weather or commute length and that the length of students' commutes has no impact on Zoom lecture attendance at all.
+ 
+#### **Commute Type/Mode**
+The type of transportation that students use to commute to class may also have an impact on Zoom lecture attendance. Students who walk, bike, or hover board to campus/class may be more sensitive to weather, making them more likely to attend Zoom lecture on days when the weather is not in their favor. This would not be a problem if we could ensure that the proportion of these students in our sample matched that of the population under study, however, because we didn't conduct a random sample (or other more rigorous sampling strategy), we cannot be sure that the proportion of students using these highly weather sensitive transportation methods is representative or our population. As such, it might be the case that we see a stronger or weaker correlation from our sample data than is actually present in the overall population, which weakens the level of confidence we can place on our final results.
+ 
+# Future Work
+Given what we have discovered and the limitations of this study, it would be interesting to examine the broader University of Utah population for Zoom attendance. A future study might take into account the various confounding variables and obstacles in our study and appropriately instrument the collection methods used such that the results from any analysis thereafter might be more robust. Without any way to properly handle these limitations, we are left without any firm conclusions. However, it can be said for certain that relationships exist in the data we have found. Due to this study's issues of internal validity, it's not possible to say whether the variables involved in the correlations are indeed those we have identified. Follow-up work might control for a greater number of variables and thus make stronger conclusions as to the associations we've attempted to identify.
