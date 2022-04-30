@@ -8,11 +8,7 @@ Ben Essex, Chris Marston, Derek Che
 If you want to knit our report or presentation from source, be sure that you have the required R packages installed:
 
 ```r
-packages <- c("fontawesome", "dplyr",
-                  "ggplot2", "plotly",
-                   "GGally", "lazyeval",
-                   "rmdformats")
-
+packages <- c("fontawesome", "dplyr", "ggplot2", "plotly", "GGally", "lazyeval", "rmdformats")
 install.packages(packages)
 ```
 
