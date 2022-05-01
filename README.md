@@ -12,4 +12,4 @@ packages <- c("fontawesome", "dplyr", "ggplot2", "plotly", "GGally", "lazyeval",
 install.packages(packages)
 ```
 
-This project is done being worked on. Go check out our [final report](https://bessex.github.io/CZAP) or [final presentation](https://bessex.github.io/CZAP/Presentation.html)!
+This project is done being worked on. Go check out our [final report](https://bessex.github.io/Engineering-Statistics-Final-Project) or [final presentation](https://bessex.github.io/Engineering-Statistics-Final-Project/Presentation.html)!
